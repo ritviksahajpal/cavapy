@@ -171,7 +171,8 @@ cli::cli_progress_step(paste0("Performing bias correction for ", variable))
         precipitation = ifelse(variable == "pr", TRUE, FALSE),
         method = "eqm",
         window = c(30, 30),
-        cross.val="loo",
+        cross.val = "kfold", 
+        folds = 2, 
         extrapolation = "constant"
       )
     )
@@ -256,34 +257,4 @@ ylim <- result$ylim
 
 out <- load_data_and_bc(cordex_domain = "SEA-22", xlim = xlim, ylim = ylim, years_up_to = 2010, rcp = "rcp26", model = 1)
 
-try <- data %>%
-            dplyr::mutate(models= purrr::map2(models, location, function(x,y) {
-              if (stringr::str_detect(y, "historical")) {
-            
-                  downscaleR::biasCorrection(
-                    y = obs[[1]],
-                    x = x,
-                    precipitation = ifelse(variable == "pr", TRUE, FALSE),
-                    method = "eqm",
-                    window = c(30, 30),
-                    cross.val="loo",
-                    extrapolation = "constant"
-                  )
-                
-                
-              } else {
-        
-                  downscaleR::biasCorrection(
-                    y = obs[[1]],
-                    x = data$models[[1]],
-                    newdata=x,
-                    precipitation = ifelse(variable == "pr", TRUE, FALSE),
-                    method = "eqm",
-                    window = c(30, 30),
-                    extrapolation = "constant"
-                  )
-                
-                
-              }
-              
-            }))
+
