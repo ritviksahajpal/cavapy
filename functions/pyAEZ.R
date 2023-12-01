@@ -164,7 +164,7 @@ cli::cli_progress_step(paste0("Performing bias correction for ", variable))
   invisible(data %>%
   dplyr::mutate(models= purrr::map2(models, location, function(x,y) {
   if (stringr::str_detect(y, "historical")) {
-    suppressMessages(
+    bc <- suppressMessages(
       downscaleR::biasCorrection(
         y = obs[[1]],
         x = x,
@@ -176,9 +176,18 @@ cli::cli_progress_step(paste0("Performing bias correction for ", variable))
         extrapolation = "constant"
       )
     )
+    
+    if (variable=="hurs") {
+      
+    bc$Data[!is.na(bc$Data) & bc$Data > 100] <- 100
+    bc
+    } else {
+      
+    bc
+    }
 
   } else {
-    suppressMessages(
+    bc <- suppressMessages(
       downscaleR::biasCorrection(
         y = obs[[1]],
         x = data$models[[1]],
@@ -189,6 +198,14 @@ cli::cli_progress_step(paste0("Performing bias correction for ", variable))
         extrapolation = "constant"
       )
     )
+    if (variable=="hurs") {
+      bc$Data[!is.na(bc$Data) & bc$Data > 100] <- 100
+      bc
+    } else {
+      
+      bc
+    }
+    
 
   }
 
@@ -250,11 +267,11 @@ return(data_list)
 
 # executing ---------------------------------------------------------------
 
-
 result <- geo_localize(country="Cambodia", xlim=NULL, ylim=NULL, buffer=0)
 xlim <- result$xlim
 ylim <- result$ylim
 
-out <- load_data_and_bc(cordex_domain = "SEA-22", xlim = xlim, ylim = ylim, years_up_to = 2010, rcp = "rcp26", model = 1)
+out <- load_data_and_bc(cordex_domain = "SEA-22", xlim = xlim, ylim = ylim, years_up_to = 2030, rcp = "rcp26", model = 1)
+
 
 
