@@ -37,7 +37,7 @@ Downloading climate data can be done in a few different ways
 
 ```
 ### Bias-corrected climate projections 
-Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", model=1, years_up_to=2030, obs=False, bias_correction=True, historical=True, xlim=None, ylim=None, years_obs=None)
+Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", model=1, years_up_to=2030, obs=False, bias_correction=True, historical=False, xlim=None, ylim=None, years_obs=None)
 ### Non bias-corrected climate projections
 Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", model=1, years_up_to=2030, obs=False, bias_correction=False, historical=False, xlim=None, ylim=None, years_obs=None)
 ### Bias-corrected climate projections plus the historical run
