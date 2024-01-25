@@ -1,6 +1,6 @@
 #### **Status
 
-**Testing**
+**Beta testing**
 
 # Introduction
 This project is about creating a Python function to automatically get the required climate data needed to run pyAEZ. This can be an optional feature of the pyAEZ climate module. 
