@@ -66,6 +66,9 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to):
             ds_cropped -= 273.15  # Convert from Kelvin to Celsius
         elif var == 'tp':
             ds_cropped *= 1000  # Convert precipitation
+        elif var == 'ssrd':
+            ds_cropped /= 86400 # convert
+            ds_cropped.attrs['units'] = 'W m-2'# adjust measures 
 
         # Select years
         years = [x for x in years_obs]
@@ -104,7 +107,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to):
 
 def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, years_obs: Union[range, None] = None, obs=False, bias_correction=False, historical=False, buffer=0, xlim=None, ylim=None):
     # Validate inputs
-    valid_variables = ["pr", "tasmax", "tasmin", "rsds", "sfcWind", "hurs"]
+    valid_variables = ["rsds", "tasmax", "tasmin", "pr", "sfcWind", "hurs"]
     valid_domains = ["AFR-22", "EAS-22", "SEA-22", "WAS-22", "AUS-22", "SAM-22", "CAM-22"]
     valid_rcps = ["rcp26", "rcp85"]
 
@@ -220,7 +223,7 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, model, years_up_to, years_ob
     xarray.DataArray or xarray.Dataset: The processed climate data as an xarray object in a list.
     """
     results = {}
-    for variable in ["tasmax", "tasmin", "pr", "hurs", "rsds", "sfcWind"]:
+    for variable in ["rsds", "tasmin", "pr", "hurs", "tasmax", "sfcWind"]:
         print(f"[bold yellow]Processing variable: {variable}[/bold yellow]")
         result = climate_data(
             country=country, 
