@@ -214,11 +214,11 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, model, years_up_to, years_ob
     cordex_domain (str): CORDEX domain of the climate data (e.g. AFR-22, EAS-22, SEA-22). 
     rcp (str): Representative Concentration Pathway (e.g., 'rcp26', 'rcp85').
     model (int): Model number to use (range 1 to 6).
-    years_obs (range): Range of years for observational data. Only used when obs is True. (default: None).
-    years_up_to (int): The ending year for the projected data. Projections start in 2006 and ends in 2100.
+    years_obs (range): Range of years for observational data (ERA5 only). Only used when obs is True. (default: None).
+    years_up_to (int): The ending year for the projected data. Projections start in 2006 and ends in 2100. Hence, if years_up_to is set to 2030, data will be downloaded for the 2006-2030 period.
     obs (bool): Flag to indicate if processing observational data (default: False).
     bias_correction (bool): Flag to apply bias correction (default: False).
-    historical (bool): Flag to indicate if processing historical data (default: False). If True, historical data is provided together with projections.
+    historical (bool): Flag to indicate if processing historical data (default: False). If True, historical data is provided together with projections. Historical simulation runs for CORDEX-CORE initiative are provided for the 1980-2005 time period.
     buffer (int): Buffer distance to expand the region of interest (default: 0).
     xlim (list or None): Longitudinal bounds of the region of interest. Specify only when 'country' is None (default: None).
     ylim (list or None): Latitudinal bounds of the region of interest. Specify only when 'country' is None (default: None).
