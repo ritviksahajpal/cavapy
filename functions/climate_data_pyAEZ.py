@@ -69,6 +69,9 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to):
         elif var == 'ssrd':
             ds_cropped /= 86400 # convert
             ds_cropped.attrs['units'] = 'W m-2'# adjust measures 
+        elif var == 'sfcwind':
+            ds_cropped = ds_cropped * (4.87 / np.log((67.8 * 10) - 5.42))  # Convert wind speed from 10 m to 2 m
+
 
         # Select years
         years = [x for x in years_obs]
@@ -83,6 +86,8 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to):
             ds_cropped -= 273.15  # Convert from Kelvin to Celsius
         elif variable == 'pr':
             ds_cropped *= 86400  # Convert from kg m^-2 s^-1 to mm/day
+        elif variable == 'sfcWind':
+            ds_cropped = ds_cropped * (4.87 / np.log((67.8 * 10) - 5.42))  # Convert wind speed from 10 m to 2 m
 
         # Select years based on rcp
         if "rcp" in url:
@@ -104,7 +109,6 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to):
 
 
 ##################################################### deep testing
-
 def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, years_obs: Union[range, None] = None, obs=False, bias_correction=False, historical=False, buffer=0, xlim=None, ylim=None):
     # Validate inputs
     valid_variables = ["rsds", "tasmax", "tasmin", "pr", "sfcWind", "hurs"]
@@ -223,7 +227,7 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, model, years_up_to, years_ob
     xarray.DataArray or xarray.Dataset: The processed climate data as an xarray object in a list.
     """
     results = {}
-    for variable in ["rsds", "tasmin", "pr", "hurs", "tasmax", "sfcWind"]:
+    for variable in ["tasmin", "pr", "hurs", "tasmax", "sfcWind", "rsds"]:
         print(f"[bold yellow]Processing variable: {variable}[/bold yellow]")
         result = climate_data(
             country=country, 
