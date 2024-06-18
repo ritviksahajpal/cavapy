@@ -11,16 +11,17 @@ CAVA has available CORDEX-CORE climate models, the high resolution (25 Km) dynam
 
 The currently available data is:
 
--CORDEX-CORE simulations (3 GCMs donwscaled with 2 RCMs for two RCPs)
--W5E5 and ERA5 reanalyses datasets
+- CORDEX-CORE simulations (3 GCMs donwscaled with 2 RCMs for two RCPs)
+- W5E5 and ERA5 reanalyses datasets
+  
 Available variables are:
 
--Daily maximum temperature (tasmax)
--Daily minimum temperature (tasmin)
--Daily precipitation (pr)
--Daily relative humidity (hurs)
--Daily wind speed (sfcWind)
--Daily solar radiation (rsds)
+- Daily maximum temperature (tasmax)
+- Daily minimum temperature (tasmin)
+- Daily precipitation (pr)
+- Daily relative humidity (hurs)
+- Daily wind speed (sfcWind)
+- Daily solar radiation (rsds)
 
 
 
