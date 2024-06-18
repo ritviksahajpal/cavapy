@@ -11,16 +11,18 @@ CAVA has available CORDEX-CORE climate models, the high resolution (25 Km) dynam
 
 The currently available data is:
 
-CORDEX-CORE simulations (3 GCMs donwscaled with 2 RCMs for two RCPs)
-W5E5 and ERA5 reanalyses datasets
+-CORDEX-CORE simulations (3 GCMs donwscaled with 2 RCMs for two RCPs)
+-W5E5 and ERA5 reanalyses datasets
 Available variables are:
 
-Daily maximum temperature (tasmax)
-Daily minimum temperature (tasmin)
-Daily precipitation (pr)
-Daily relative humidity (hurs)
-Daily wind speed (sfcWind)
-Daily solar radiation (rsds)
+-Daily maximum temperature (tasmax)
+-Daily minimum temperature (tasmin)
+-Daily precipitation (pr)
+-Daily relative humidity (hurs)
+-Daily wind speed (sfcWind)
+-Daily solar radiation (rsds)
+
+
 
 ## Usage
 The function can be downloaded from the script folder and imported, for example, as follow:
@@ -36,7 +38,7 @@ help(cliAEZ.climate_data_pyAEZ)
 Downloading climate data can be done in a few different ways
 
 ```
-### Bias-corrected climate projections 
+### Bias-corrected climate projections with the empirical quantile mapping method
 Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", model=1, years_up_to=2030, obs=False, bias_correction=True, historical=False, xlim=None, ylim=None, years_obs=None)
 ### Non bias-corrected climate projections
 Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", model=1, years_up_to=2030, obs=False, bias_correction=False, historical=False, xlim=None, ylim=None, years_obs=None)
