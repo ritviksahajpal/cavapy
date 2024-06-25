@@ -1,3 +1,4 @@
+# Required libraries
 import geopandas as gpd
 import osmnx as ox
 import requests
@@ -6,15 +7,13 @@ import pandas as pd
 import xarray as xr
 import numpy as np
 from typing import Union
-from tqdm import tqdm 
-from tqdm import trange
+from tqdm import tqdm, trange
 from xclim import sdba
 from rich import print
-# parameters --------------------------------------------------------------
+import dask
+from dask import delayed
 
-
-# intermediate functions ------------------------------------------------------------
-
+# Function to geo-localize based on country or bounding box
 def geo_localize(country, xlim, ylim, buffer):
     if country is not None and (xlim is not None or ylim is not None):
         raise ValueError("Either select a country or specify a region (xlim and ylim), not both")
@@ -35,8 +34,8 @@ def geo_localize(country, xlim, ylim, buffer):
     ylim = [bounds[1] - buffer, bounds[3] + buffer]
     
     return {'xlim': xlim, 'ylim': ylim}
-  
 
+# Function to download climate data
 def download_data(url, bbox, variable, obs, years_obs, years_up_to):
     variable_map = {
         "pr": "tp",
@@ -67,11 +66,10 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to):
         elif var == 'tp':
             ds_cropped *= 1000  # Convert precipitation
         elif var == 'ssrd':
-            ds_cropped /= 86400 # convert
-            ds_cropped.attrs['units'] = 'W m-2'# adjust measures 
+            ds_cropped /= 86400  # Convert from J/m^2 to W/m^2
+            ds_cropped.attrs['units'] = 'W m-2'
         elif var == 'sfcwind':
             ds_cropped = ds_cropped * (4.87 / np.log((67.8 * 10) - 5.42))  # Convert wind speed from 10 m to 2 m
-
 
         # Select years
         years = [x for x in years_obs]
@@ -92,23 +90,20 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to):
         # Select years based on rcp
         if "rcp" in url:
             years = [x for x in range(2006, years_up_to + 1)]
-        
         else:
             years = [x for x in range(1980, 2006)]
-         
+
         # Add missing dates
-        ds_cropped = ds_cropped.convert_calendar(calendar = 'gregorian', missing=np.nan, align_on="date")
-        
+        ds_cropped = ds_cropped.convert_calendar(calendar='gregorian', missing=np.nan, align_on="date")
+
         time_mask = (ds_cropped['time'].dt.year >= years[0]) & (ds_cropped['time'].dt.year <= years[-1])
-    
+
     # subset years
     ds_cropped = ds_cropped.sel(time=time_mask)
 
     return ds_cropped
 
-
-
-##################################################### deep testing
+# Function for climate data processing
 def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, years_obs: Union[range, None] = None, obs=False, bias_correction=False, historical=False, buffer=0, xlim=None, ylim=None):
     # Validate inputs
     valid_variables = ["rsds", "tasmax", "tasmin", "pr", "sfcWind", "hurs"]
@@ -126,7 +121,6 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
     if years_obs is not None and not (1980 <= min(years_obs) <= max(years_obs) <= 2020):
         raise ValueError("Years in years_obs must be within the range 1980 to 2020")
 
-    
     # Geo-localize
     bbox = geo_localize(country=country, xlim=xlim, ylim=ylim, buffer=buffer)
     csv_url = "https://data.meteo.unican.es/inventory.csv"
@@ -160,7 +154,7 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
             downloaded_obs = []
             with trange(1, desc="Downloading observations (ERA5) used for bias correction, cropping to specified region of interest and converting units") as t:
                 for _ in t:
-                    obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980,2006))
+                    obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980, 2006))
                     downloaded_obs.append(obs_model)
             ref = downloaded_obs[0]
             QM_mo = sdba.EmpiricalQuantileMapping.train(ref, hist, group='time.month', kind='*' if variable == 'pr' else '+')
@@ -169,8 +163,8 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
             proj_bs = QM_mo.adjust(proj)
             print("[bold yellow]Done![/bold yellow]")
             if variable == 'hurs':
-                hist_bs = hist_bs.where(hist_bs <= 100, 100)
-                proj_bs = proj_bs.where(proj_bs <= 100, 100)
+                hist_bs = hist_bs.where(hist_bs <=
+                100, 100)
             combined = xr.concat([hist_bs, proj_bs], dim='time')
             return combined
 
@@ -182,7 +176,7 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
             downloaded_obs = []
             with trange(1, desc="Downloading observations (ERA5) used for bias correction, cropping to specified region of interest and converting units") as t:
                 for _ in t:
-                    obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980,2006))
+                    obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980, 2006))
                     downloaded_obs.append(obs_model)
             ref = downloaded_obs[0]
             print("[bold yellow]Performing bias correction with eqm[/bold yellow]")
@@ -202,9 +196,7 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
         print("[bold yellow]Done![/bold yellow]")        
         return downloaded_obs[0]
 
-
-################################################################
-# wrappign up everything
+# Function to process climate data for multiple variables
 def climate_data_pyAEZ(country, cordex_domain, rcp, model, years_up_to, years_obs: Union[range, None] = None, bias_correction=False, historical=False, obs=False, buffer=0, xlim=None, ylim=None):
     """
     Process climate data required by pyAEZ climate module. The function automatically access CORDEX-CORE models at 0.25° and the ERA5 datasets.
@@ -224,27 +216,39 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, model, years_up_to, years_ob
     ylim (list or None): Latitudinal bounds of the region of interest. Specify only when 'country' is None (default: None).
 
     Returns:
-    xarray.DataArray or xarray.Dataset: The processed climate data as an xarray object in a list.
+    dict: A dictionary containing processed climate data for each variable as an xarray object.
     """
     results = {}
-    for variable in ["tasmin", "pr", "hurs", "tasmax", "sfcWind", "rsds"]:
-        print(f"[bold yellow]Processing variable: {variable}[/bold yellow]")
-        result = climate_data(
-            country=country, 
+
+    # List of variables to process
+    variables = ["tasmin", "pr", "hurs", "tasmax", "sfcWind", "rsds"]
+
+    # Use Dask delayed to parallelize the processing of each variable
+    delayed_results = []
+    for variable in variables:
+        delayed_result = delayed(climate_data)(
+            country=country,
             xlim=xlim,
             ylim=ylim,
-            cordex_domain=cordex_domain, 
-            rcp=rcp, 
-            model=model, 
-            years_obs=years_obs, 
-            years_up_to=years_up_to, 
-            bias_correction=bias_correction, 
-            historical=historical, 
-            variable=variable, 
-            obs=obs, 
+            cordex_domain=cordex_domain,
+            rcp=rcp,
+            model=model,
+            years_obs=years_obs,
+            years_up_to=years_up_to,
+            bias_correction=bias_correction,
+            historical=historical,
+            variable=variable,
+            obs=obs,
             buffer=buffer
         )
-        results[variable] = result
-    return results
+        delayed_results.append(delayed_result)
 
+    # Compute all delayed results
+    computed_results = dask.compute(*delayed_results)
+
+    # Store results in a dictionary
+    for i, variable in enumerate(variables):
+        results[variable] = computed_results[i]
+
+    return results
 
