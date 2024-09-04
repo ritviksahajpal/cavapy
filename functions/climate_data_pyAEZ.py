@@ -241,7 +241,7 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years
     dict: A dictionary containing processed climate data for each variable as an xarray object.
     """
     
-    dask.config.set(scheduler='threads', num_workers=cores)
+    dask.config.set(scheduler='threads', num_workers=cores, threads_per_worker=1)
 
     results = {}
 
