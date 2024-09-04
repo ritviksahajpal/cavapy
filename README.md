@@ -36,7 +36,7 @@ import climate_data_pyAEZ as cliAEZ
 help(cliAEZ.climate_data_pyAEZ)
 
 ```
-Downloading climate data can be done in a few different ways, depending on the interest.
+Depending on the interest, downloading climate data can be done in a few different ways. Note that GCM stands for General Circulation Model while RCP stands for Regional Climate Model. As the climate data comes from the CORDEX-CORE initiative, users can choose between 3 different GCMs downscaled with two RCMs. In total, there are six simulations for any given domain (except for CAS-22 where only three are available).
 
 ```
 ### Bias-corrected climate projections
