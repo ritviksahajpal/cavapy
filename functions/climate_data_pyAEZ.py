@@ -115,8 +115,8 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
     return ds_cropped
 
 # Function for climate data processing
-# Function for climate data processing
-def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, years_obs: Union[range, None] = None, obs=False, bias_correction=False, historical=False, buffer=0, xlim=None, ylim=None, remote=True):
+
+def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, years_obs, obs, bias_correction, historical, buffer, xlim, ylim, remote):
     # Validate inputs
     valid_variables = ["rsds", "tasmax", "tasmin", "pr", "sfcWind", "hurs"]
     valid_domains = ["AFR-22", "EAS-22", "SEA-22", "WAS-22", "AUS-22", "SAM-22", "CAM-22"]
@@ -140,7 +140,7 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
     # Read CSV data into a pandas DataFrame
     pd.options.mode.chained_assignment = None
     data = pd.read_csv(csv_url)
-    column_to_use = 'hub' if remote else 'activity'  # Decide which column to use based on `remote`
+    column_to_use = 'activity' if remote else 'hub'  # Decide which column to use based on `remote`
     filtered_data = data[
         (data['activity'].str.contains("FAO", na=False)) &
         (data['domain'] == cordex_domain) &
