@@ -50,9 +50,9 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
     if obs:
         var = variable_map[variable]
         if remote:
-          ds_var = xr.open_dataset("https://hub.ipcc.ifca.es/thredds/dodsC/fao/observations/ERA5/0.25/ERA5_025.ncml", chunks={'time': 'auto'})[var]
+          ds_var = xr.open_dataset("https://hub.ipcc.ifca.es/thredds/dodsC/fao/observations/ERA5/0.25/ERA5_025.ncml")[var]
         else:
-          ds_var = xr.open_dataset("/home/jovyan/shared/data/observations/ERA5/0.25/ERA5_025.ncml", chunks={'time': 'auto'})[var]
+          ds_var = xr.open_dataset("/home/jovyan/shared/data/observations/ERA5/0.25/ERA5_025.ncml")[var]
 
         # Coordinate normalization and renaming for 'hurs'
         if var == 'hurs':
@@ -82,7 +82,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
         time_mask = (ds_cropped['time'].dt.year >= years[0]) & (ds_cropped['time'].dt.year <= years[-1])
 
     else:
-        ds_var = xr.open_dataset(url, chunks={'time': 'auto'})[variable]
+        ds_var = xr.open_dataset(url)[variable]
         ds_cropped = ds_var.sel(longitude=slice(bbox["xlim"][0], bbox["xlim"][1]), latitude=slice(bbox["ylim"][1], bbox["ylim"][0]))
 
         # Unit conversion
