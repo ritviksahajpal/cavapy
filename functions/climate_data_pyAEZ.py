@@ -36,7 +36,7 @@ def geo_localize(country, xlim, ylim, buffer):
     return {'xlim': xlim, 'ylim': ylim}
 
 # Function to download climate data
-def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
+def download_data(url, bbox, variable, obs, years_obs, years_up_to):
     variable_map = {
         "pr": "tp",
         "tasmax": "t2mx",
@@ -158,7 +158,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
         downloaded_models = []
         # Use tqdm to iterate through the URLs and download the models
         for url in tqdm(filtered_data[column_to_use], desc="Downloading CORDEX climate data, cropping to specified region of interest and converting units"):
-            model_data = download_data(url=url, bbox=bbox, variable=variable, obs=False, years_up_to=years_up_to, years_obs=years_obs, remote=remote)
+            model_data = download_data(url=url, bbox=bbox, variable=variable, obs=False, years_up_to=years_up_to, years_obs=years_obs)
             downloaded_models.append(model_data)
 
         # Add the downloaded models to the DataFrame
