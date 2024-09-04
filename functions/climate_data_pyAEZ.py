@@ -224,8 +224,8 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years
     country (str): Name of the country for which data is to be processed. Use None if specifying a region using xlim and ylim.
     cordex_domain (str): CORDEX domain of the climate data (e.g. AFR-22, EAS-22, SEA-22). 
     rcp (str): Representative Concentration Pathway (e.g., 'rcp26', 'rcp85').
-    gcm (str): GCM name.
-    rcm (str): RCM name.
+    gcm (str): GCM name. (one of 'MPI', 'NCC', "MOHC").
+    rcm (str): RCM name. (One of 'REMO', 'Reg').
     years_obs (range): Range of years for observational data (ERA5 only). Only used when obs is True. (default: None).
     years_up_to (int): The ending year for the projected data. Projections start in 2006 and ends in 2100. Hence, if years_up_to is set to 2030, data will be downloaded for the 2006-2030 period.
     obs (bool): Flag to indicate if processing observational data (default: False).
