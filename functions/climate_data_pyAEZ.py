@@ -36,7 +36,7 @@ def geo_localize(country, xlim, ylim, buffer):
     return {'xlim': xlim, 'ylim': ylim}
 
 # Function to download climate data
-def download_data(url, bbox, variable, obs, years_obs, years_up_to):
+def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
     variable_map = {
         "pr": "tp",
         "tasmax": "t2mx",
@@ -158,7 +158,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
         downloaded_models = []
         # Use tqdm to iterate through the URLs and download the models
         for url in tqdm(filtered_data[column_to_use], desc="Downloading CORDEX climate data, cropping to specified region of interest and converting units"):
-            model_data = download_data(url=url, bbox=bbox, variable=variable, obs=False, years_up_to=years_up_to, years_obs=years_obs)
+            model_data = download_data(url=url, bbox=bbox, variable=variable, obs=False, years_up_to=years_up_to, years_obs=years_obs, remote=remote)
             downloaded_models.append(model_data)
 
         # Add the downloaded models to the DataFrame
@@ -172,7 +172,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
             downloaded_obs = []
             with trange(1, desc="Downloading observations (ERA5) used for bias correction, cropping to specified region of interest and converting units") as t:
                 for _ in t:
-                    obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980, 2006))
+                    obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980, 2006), remote=remote)
                     downloaded_obs.append(obs_model)
             ref = downloaded_obs[0]
             QM_mo = sdba.EmpiricalQuantileMapping.train(ref, hist, group='time.month', kind='*' if variable == 'pr' else '+')
@@ -194,7 +194,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
             downloaded_obs = []
             with trange(1, desc="Downloading observations (ERA5) used for bias correction, cropping to specified region of interest and converting units") as t:
                 for _ in t:
-                    obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980, 2006))
+                    obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980, 2006), remote=remote)
                     downloaded_obs.append(obs_model)
             ref = downloaded_obs[0]
             print("[bold yellow]Performing bias correction with eqm[/bold yellow]")
@@ -209,7 +209,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
         downloaded_obs = []
         with trange(1, desc="Downloading observations (ERA5), cropping to specified region of interest and converting units") as t:
             for _ in t:
-                obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=years_obs)
+                obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=years_obs, remote=remote)
                 downloaded_obs.append(obs_model)
         print("[bold yellow]Done![/bold yellow]")        
         return downloaded_obs[0]
