@@ -75,7 +75,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
             ds_cropped.attrs['units'] = 'W m-2'
         elif var == 'sfcwind':
             ds_cropped = ds_cropped * (4.87 / np.log((67.8 * 10) - 5.42))  # Convert wind speed from 10 m to 2 m
-            ds_cropped.attrs['units'] = 'm/s 2m'
+            ds_cropped.attrs['units'] = 'm-s'
 
         # Select years
         years = [x for x in years_obs]
@@ -96,7 +96,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
             ds_cropped.attrs['units'] = 'W m-2'
         elif variable == 'sfcWind':
             ds_cropped = ds_cropped * (4.87 / np.log((67.8 * 10) - 5.42))  # Convert wind speed from 10 m to 2 m
-            ds_cropped.attrs['units'] = 'm/s 2m'
+            ds_cropped.attrs['units'] = 'm-s'
 
         # Select years based on rcp
         if "rcp" in url:
@@ -157,7 +157,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
     if not obs:
         downloaded_models = []
         # Use tqdm to iterate through the URLs and download the models
-        for url in tqdm(filtered_data[column_to_use], desc="Downloading CORDEX climate data, cropping to specified region of interest and converting units"):
+        for url in tqdm(filtered_data[column_to_use], desc=f"Downloading selected CORDEX-CORE climate model for {variable} for the specified rcp plus the historical run"):
             model_data = download_data(url=url, bbox=bbox, variable=variable, obs=False, years_up_to=years_up_to, years_obs=years_obs, remote=remote)
             downloaded_models.append(model_data)
 
@@ -170,7 +170,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
         if bias_correction and historical:
             # Load observations for bias correction
             downloaded_obs = []
-            with trange(1, desc="Downloading observations (ERA5) used for bias correction, cropping to specified region of interest and converting units") as t:
+            with trange(1, desc=f"Downloading observations (ERA5) for {variable} used for bias correction") as t:
                 for _ in t:
                     obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980, 2006), remote=remote)
                     downloaded_obs.append(obs_model)
@@ -192,7 +192,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
 
         elif bias_correction and not historical:
             downloaded_obs = []
-            with trange(1, desc="Downloading observations (ERA5) used for bias correction, cropping to specified region of interest and converting units") as t:
+            with trange(1, desc=f"Downloading observations (ERA5) for {variable} used for bias correction") as t:
                 for _ in t:
                     obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980, 2006), remote=remote)
                     downloaded_obs.append(obs_model)
@@ -207,7 +207,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
 
     else:  # when observations are True
         downloaded_obs = []
-        with trange(1, desc="Downloading observations (ERA5), cropping to specified region of interest and converting units") as t:
+        with trange(1, desc=f"Downloading observations (ERA5) for {variable}") as t:
             for _ in t:
                 obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=years_obs, remote=remote)
                 downloaded_obs.append(obs_model)
@@ -241,7 +241,7 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years
     dict: A dictionary containing processed climate data for each variable as an xarray object.
     """
     
-    dask.config.set(scheduler='threads', num_workers=cores, threads_per_worker=1)
+    dask.config.set(scheduler='threads', num_workers=cores)
 
     results = {}
 
@@ -251,6 +251,7 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years
     # Use Dask delayed to parallelize the processing of each variable
     delayed_results = []
     for variable in variables:
+
         delayed_result = delayed(climate_data)(
             country=country,
             xlim=xlim,
