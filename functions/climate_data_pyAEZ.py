@@ -115,6 +115,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
     return ds_cropped
 
 # Function for climate data processing
+# Function for climate data processing
 def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, years_obs: Union[range, None] = None, obs=False, bias_correction=False, historical=False, buffer=0, xlim=None, ylim=None, remote=True):
     # Validate inputs
     valid_variables = ["rsds", "tasmax", "tasmin", "pr", "sfcWind", "hurs"]
@@ -139,14 +140,14 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
     # Read CSV data into a pandas DataFrame
     pd.options.mode.chained_assignment = None
     data = pd.read_csv(csv_url)
-    column_to_use = 'hub' if remote else 'activity'
+    column_to_use = 'hub' if remote else 'activity'  # Decide which column to use based on `remote`
     filtered_data = data[
         (data['activity'].str.contains("FAO", na=False)) &
         (data['domain'] == cordex_domain) &
         (data['experiment'].isin([rcp, 'historical'])) &
         (data.groupby([column_to_use, 'domain', 'experiment']).cumcount() + 1 == model)
     ]
-    filtered_data = filtered_data[['experiment', column_to_use]]
+    filtered_data = filtered_data[['experiment', column_to_use]]  # Use the correct column
 
     if not obs:
         downloaded_models = []
@@ -207,6 +208,7 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
                 downloaded_obs.append(obs_model)
         print("[bold yellow]Done![/bold yellow]")        
         return downloaded_obs[0]
+
 
 # Function to process climate data for multiple variables
 def climate_data_pyAEZ(country, cordex_domain, rcp, model, years_up_to, years_obs: Union[range, None] = None, bias_correction=False, historical=False, obs=False, buffer=0, xlim=None, ylim=None, remote=True):
