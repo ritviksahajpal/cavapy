@@ -116,11 +116,13 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
 
 # Function for climate data processing
 
-def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, years_obs, obs, bias_correction, historical, buffer, xlim, ylim, remote):
+def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, years_obs, obs, bias_correction, historical, buffer, xlim, ylim, remote):
     # Validate inputs
     valid_variables = ["rsds", "tasmax", "tasmin", "pr", "sfcWind", "hurs"]
     valid_domains = ["AFR-22", "EAS-22", "SEA-22", "WAS-22", "AUS-22", "SAM-22", "CAM-22"]
     valid_rcps = ["rcp26", "rcp85"]
+    valid_gcm = ["MOHC", "MPI", "NCC"]
+    valid_rcm = ["REMO", "Reg"]
 
     if variable not in valid_variables:
         raise ValueError(f"Invalid variable. Must be one of {valid_variables}")
@@ -128,8 +130,10 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
         raise ValueError(f"Invalid domain. Must be one of {valid_domains}")
     if rcp not in valid_rcps:
         raise ValueError(f"Invalid RCP. Must be one of {valid_rcps}")
-    if not (1 <= model <= 6):
-        raise ValueError("Model number must be between 1 and 6")
+    if gcm not in valid_gcm:
+        raise ValueError(f"Invalid GCM. Must be one of {valid_gcm}")
+    if rcm not in valid_rcm:
+        raise ValueError(f"Invalid RCM. Must be one of {valid_rcm}")
     if years_obs is not None and not (1980 <= min(years_obs) <= max(years_obs) <= 2020):
         raise ValueError("Years in years_obs must be within the range 1980 to 2020")
 
@@ -144,8 +148,9 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
     filtered_data = data[
         (data['activity'].str.contains("FAO", na=False)) &
         (data['domain'] == cordex_domain) &
-        (data['experiment'].isin([rcp, 'historical'])) &
-        (data.groupby([column_to_use, 'domain', 'experiment']).cumcount() + 1 == model)
+        (data['model'].str.contains(gcm, na=False)) &
+         (data['rcm'].str.contains(rcm, na=False)) &
+        (data['experiment'].isin([rcp, 'historical']))
     ]
     filtered_data = filtered_data[['experiment', column_to_use]]  # Use the correct column
 
@@ -211,7 +216,7 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
 
 
 # Function to process climate data for multiple variables
-def climate_data_pyAEZ(country, cordex_domain, rcp, model, years_up_to, years_obs: Union[range, None] = None, bias_correction=False, historical=False, obs=False, buffer=0, xlim=None, ylim=None, remote=True):
+def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years_obs: Union[range, None] = None, bias_correction=False, historical=False, obs=False, buffer=0, xlim=None, ylim=None, remote=True):
     """
     Process climate data required by pyAEZ climate module. The function automatically access CORDEX-CORE models at 0.25° and the ERA5 datasets.
 
@@ -219,7 +224,8 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, model, years_up_to, years_ob
     country (str): Name of the country for which data is to be processed. Use None if specifying a region using xlim and ylim.
     cordex_domain (str): CORDEX domain of the climate data (e.g. AFR-22, EAS-22, SEA-22). 
     rcp (str): Representative Concentration Pathway (e.g., 'rcp26', 'rcp85').
-    model (int): Model number to use (range 1 to 6).
+    gcm (str): GCM name.
+    rcm (str): RCM name.
     years_obs (range): Range of years for observational data (ERA5 only). Only used when obs is True. (default: None).
     years_up_to (int): The ending year for the projected data. Projections start in 2006 and ends in 2100. Hence, if years_up_to is set to 2030, data will be downloaded for the 2006-2030 period.
     obs (bool): Flag to indicate if processing observational data (default: False).
@@ -247,7 +253,8 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, model, years_up_to, years_ob
             ylim=ylim,
             cordex_domain=cordex_domain,
             rcp=rcp,
-            model=model,
+            gcm=gcm,
+            rcm=rcm,
             years_obs=years_obs,
             years_up_to=years_up_to,
             bias_correction=bias_correction,
