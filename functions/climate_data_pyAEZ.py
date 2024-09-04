@@ -11,7 +11,7 @@ from rich import print
 import dask
 from dask import delayed
 
-dask.config.set(scheduler='threads', num_workers=6, threads_per_worker=1)
+
 
 # Function to geo-localize based on country or bounding box
 def geo_localize(country, xlim, ylim, buffer):
@@ -216,7 +216,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
 
 
 # Function to process climate data for multiple variables
-def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years_obs: Union[range, None] = None, bias_correction=False, historical=False, obs=False, buffer=0, xlim=None, ylim=None, remote=True):
+def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years_obs: Union[range, None] = None, bias_correction=False, historical=False, obs=False, buffer=0, xlim=None, ylim=None, remote=True, cores=6):
     """
     Process climate data required by pyAEZ climate module. The function automatically access CORDEX-CORE models at 0.25° and the ERA5 datasets.
 
@@ -235,15 +235,19 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years
     xlim (list or None): Longitudinal bounds of the region of interest. Specify only when 'country' is None (default: None).
     ylim (list or None): Latitudinal bounds of the region of interest. Specify only when 'country' is None (default: None).
     remote (bool): Flag to work with remote data or not (default: True).
+    cores (int): Number of cores to use (default: 6).
 
     Returns:
     dict: A dictionary containing processed climate data for each variable as an xarray object.
     """
+    
+    dask.config.set(scheduler='threads', num_workers=cores, threads_per_worker=1)
+
     results = {}
 
     # List of variables to process
     variables = ["tasmin", "pr", "hurs", "tasmax", "sfcWind", "rsds"]
-
+  
     # Use Dask delayed to parallelize the processing of each variable
     delayed_results = []
     for variable in variables:
