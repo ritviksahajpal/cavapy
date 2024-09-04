@@ -140,7 +140,7 @@ def climate_data(country, cordex_domain, rcp, model, years_up_to, variable, year
     # Read CSV data into a pandas DataFrame
     pd.options.mode.chained_assignment = None
     data = pd.read_csv(csv_url)
-    column_to_use = 'activity' if remote else 'hub'  # Decide which column to use based on `remote`
+    column_to_use = 'location' if remote else 'hub'  # Decide which column to use based on `remote`
     filtered_data = data[
         (data['activity'].str.contains("FAO", na=False)) &
         (data['domain'] == cordex_domain) &
