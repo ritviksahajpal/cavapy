@@ -183,6 +183,8 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
             if variable == 'hurs':
                 hist_bs = hist_bs.where(hist_bs <=
                 100, 100)
+                hist_bs = hist_bs.where(hist_bs <
+                0, 0)
             combined = xr.concat([hist_bs, proj_bs], dim='time')
             return combined
 
