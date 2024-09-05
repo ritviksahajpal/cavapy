@@ -75,7 +75,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
             ds_cropped.attrs['units'] = 'W m-2'
         elif var == 'sfcwind':
             ds_cropped = ds_cropped * (4.87 / np.log((67.8 * 10) - 5.42))  # Convert wind speed from 10 m to 2 m
-            ds_cropped.attrs['units'] = 'm-s'
+           
 
         # Select years
         years = [x for x in years_obs]
@@ -96,7 +96,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
             ds_cropped.attrs['units'] = 'W m-2'
         elif variable == 'sfcWind':
             ds_cropped = ds_cropped * (4.87 / np.log((67.8 * 10) - 5.42))  # Convert wind speed from 10 m to 2 m
-            ds_cropped.attrs['units'] = 'm-s'
+           
 
         # Select years based on rcp
         if "rcp" in url:
