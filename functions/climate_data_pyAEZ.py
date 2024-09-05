@@ -50,7 +50,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
     if obs:
         var = variable_map[variable]
         if remote:
-          ds_var = xr.open_dataset("https://hub.ipcc.ifca.es/thredds/dodsC/fao/observations/ERA5/0.25/ERA5_025.ncml")[var]
+          ds_var = xr.open_dataset("https://data.meteo.unican.es/thredds/dodsC/copernicus/cds/ERA5_0.25")[var]
         else:
           ds_var = xr.open_dataset("/home/jovyan/shared/data/observations/ERA5/0.25/ERA5_025.ncml")[var]
 
@@ -279,4 +279,3 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years
         results[variable] = computed_results[i]
 
     return results
-
