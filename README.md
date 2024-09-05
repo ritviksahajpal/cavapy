@@ -36,17 +36,19 @@ import climate_data_pyAEZ as cliAEZ
 help(cliAEZ.climate_data_pyAEZ)
 
 ```
-Downloading climate data can be done in a few different ways
+Depending on the interest, downloading climate data can be done in a few different ways. Note that GCM stands for General Circulation Model while RCP stands for Regional Climate Model. As the climate data comes from the CORDEX-CORE initiative, users can choose between 3 different GCMs downscaled with two RCMs. In total, there are six simulations for any given domain (except for CAS-22 where only three are available).
+
+Since bias-correction requires both the historical run of the CORDEX model and the observational dataset (in this case ERA5), even when the historical argument is set to False, the historical run will be used for learning the bias-correction factor.
 
 ```
-### Bias-corrected climate projections with the empirical quantile mapping method
-Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", model=1, years_up_to=2030, obs=False, bias_correction=True, historical=False, xlim=None, ylim=None, years_obs=None)
+### Bias-corrected climate projections
+Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=False, xlim=None, ylim=None, years_obs=None)
 ### Non bias-corrected climate projections
-Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", model=1, years_up_to=2030, obs=False, bias_correction=False, historical=False, xlim=None, ylim=None, years_obs=None)
-### Bias-corrected climate projections plus the historical run
-Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", model=1, years_up_to=2030, obs=False, bias_correction=True, historical=True, xlim=None, ylim=None, years_obs=None)
-### Observations only
-Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", model=1, years_up_to=2030, obs=True, bias_correction=True, historical=True, xlim=None, ylim=None, years_obs=range(1980,2019))
+Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=False, historical=False, xlim=None, ylim=None, years_obs=None)
+### Bias-corrected climate projections plus the historical run. This is useful when assessing changes in crop yield from the historical period. In this case, we provide the bias-corrected # historical run of the climate models plus the projections. 
+Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=True, xlim=None, ylim=None, years_obs=None)
+### Observations only (ERA5)
+Zambia_climate_data = cliAEZ.climate_data_pyAEZ(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=True, bias_correction=True, historical=True, xlim=None, ylim=None, years_obs=range(1980,2019))
 ```
 
 
