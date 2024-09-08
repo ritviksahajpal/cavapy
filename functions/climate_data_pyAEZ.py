@@ -50,7 +50,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
     if obs:
         var = variable_map[variable]
         if remote:
-          ds_var = xr.open_dataset("https://data.meteo.unican.es/thredds/dodsC/copernicus/cds/ERA5_0.25")[var]
+          ds_var = xr.open_dataset("https://hub.ipcc.ifca.es/thredds/dodsC/fao/observations/ERA5/0.25/ERA5_025.ncml")[var]
         else:
           ds_var = xr.open_dataset("/home/jovyan/shared/data/observations/ERA5/0.25/ERA5_025.ncml")[var]
 
@@ -75,7 +75,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
             ds_cropped.attrs['units'] = 'W m-2'
         elif var == 'sfcwind':
             ds_cropped = ds_cropped * (4.87 / np.log((67.8 * 10) - 5.42))  # Convert wind speed from 10 m to 2 m
-           
+            ds_cropped.attrs['units'] = 'm s-1'
 
         # Select years
         years = [x for x in years_obs]
@@ -96,7 +96,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
             ds_cropped.attrs['units'] = 'W m-2'
         elif variable == 'sfcWind':
             ds_cropped = ds_cropped * (4.87 / np.log((67.8 * 10) - 5.42))  # Convert wind speed from 10 m to 2 m
-           
+            ds_cropped.attrs['units'] = 'm s-1'
 
         # Select years based on rcp
         if "rcp" in url:
@@ -175,10 +175,10 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
                     obs_model = download_data(url="not_needed", bbox=bbox, variable=variable, obs=True, years_up_to=years_up_to, years_obs=range(1980, 2006), remote=remote)
                     downloaded_obs.append(obs_model)
             ref = downloaded_obs[0]
-            QM_mo = sdba.EmpiricalQuantileMapping.train(ref, hist, group='time.month', kind='*' if variable == 'pr' else '+')
+            QM_mo = sdba.EmpiricalQuantileMapping.train(ref, hist, group='time.month', kind='*' if variable in ['pr', 'rsds', 'sfcWind'] else '+')
             print("[bold yellow]Performing bias correction with eqm[/bold yellow]")
-            hist_bs = QM_mo.adjust(hist)
-            proj_bs = QM_mo.adjust(proj)
+            hist_bs = QM_mo.adjust(hist, extrapolation="constant", interp="linear")
+            proj_bs = QM_mo.adjust(proj, extrapolation="constant", interp="linear")
             print("[bold yellow]Done![/bold yellow]")
             if variable == 'hurs':
                 hist_bs = hist_bs.where(hist_bs <=
@@ -200,11 +200,12 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
                     downloaded_obs.append(obs_model)
             ref = downloaded_obs[0]
             print("[bold yellow]Performing bias correction with eqm[/bold yellow]")
-            QM_mo = sdba.EmpiricalQuantileMapping.train(ref, hist, group='time.month', kind='*' if variable == 'pr' else '+')
-            proj_bs = QM_mo.adjust(proj)
+            QM_mo = sdba.EmpiricalQuantileMapping.train(ref, hist, group='time.month',  kind='*' if variable in ['pr', 'rsds', 'sfcWind'] else '+') # multiplicative approach for pr, rsds and wind speed
+            proj_bs = QM_mo.adjust(proj, extrapolation="constant", interp="linear")
             print("[bold yellow]Done![/bold yellow]")
             if variable == 'hurs':
                 proj_bs = proj_bs.where(proj_bs <= 100, 100)
+                proj_bs = proj_bs.where(proj_bs >= 0, 0)
             return proj_bs
 
     else:  # when observations are True
@@ -248,6 +249,7 @@ def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years
     results = {}
 
     # List of variables to process
+    
     variables = ["tasmin", "pr", "hurs", "tasmax", "sfcWind", "rsds"]
   
     # Use Dask delayed to parallelize the processing of each variable
