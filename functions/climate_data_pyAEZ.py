@@ -1,6 +1,5 @@
 # Required libraries
 import geopandas as gpd
-import osmnx as ox
 import pandas as pd
 import xarray as xr
 import numpy as np
@@ -10,30 +9,37 @@ from xclim import sdba
 from rich import print
 import dask
 from dask import delayed
-
-
+from shapely.geometry import box
 
 # Function to geo-localize based on country or bounding box
-def geo_localize(country, xlim, ylim, buffer):
+def geo_localize(country=None, xlim=None, ylim=None, buffer=0):
     if country is not None and (xlim is not None or ylim is not None):
         raise ValueError("Either select a country or specify a region (xlim and ylim), not both")
 
     if country is not None:
-        # Load country shapefile from Natural Earth website
-        country_shp = ox.geocode_to_gdf(country)
-        bounds = country_shp.total_bounds
+        # Load the country shapefile manually (download from Natural Earth website)
+        world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))  # Update the path
+        country_shp = world[world.name == country]
+
+        if country_shp.empty:
+            raise ValueError(f"Country '{country}' not found in shapefile.")
+
+        bounds = country_shp.total_bounds  # [minx, miny, maxx, maxy]
+
     elif xlim is not None and ylim is not None:
         # Create a bounding box based on provided xlim and ylim
         bbox = gpd.GeoSeries([box(min(xlim), min(ylim), max(xlim), max(ylim))])
-        bounds = bbox.bounds.iloc[0]
+        bounds = bbox.total_bounds  # [minx, miny, maxx, maxy]
     else:
         raise ValueError("Either country or both xlim and ylim must be provided")
 
     # Apply buffer
     xlim = [bounds[0] - buffer, bounds[2] + buffer]
     ylim = [bounds[1] - buffer, bounds[3] + buffer]
-    
+
     return {'xlim': xlim, 'ylim': ylim}
+
+
 
 # Function to download climate data
 def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
@@ -144,7 +150,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
 
     # Read CSV data into a pandas DataFrame
     pd.options.mode.chained_assignment = None
-    data = pd.read_csv(csv_url) if remote else pd.read_csv(csv_url_local)
+    data = pd.read_csv(csv_url_remote) if remote else pd.read_csv(csv_url_local)
     column_to_use = 'location' if remote else 'hub'  # Decide which column to use based on `remote`
     filtered_data = data[
         (data['activity'].str.contains("FAO", na=False)) &
