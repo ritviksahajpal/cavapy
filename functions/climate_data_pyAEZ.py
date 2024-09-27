@@ -140,7 +140,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
     # Geo-localize
     bbox = geo_localize(country=country, xlim=xlim, ylim=ylim, buffer=buffer)
     csv_url_remote = "https://hub.ipcc.ifca.es/thredds/fileServer/inventories/cava.csv"
-    csv_url_local = "/home/jovyan/shared/inventories/cava/cava.csv"
+    csv_url_local = "/home/jovyan/shared/inventories/cava/inventory.csv"
 
     # Read CSV data into a pandas DataFrame
     pd.options.mode.chained_assignment = None
