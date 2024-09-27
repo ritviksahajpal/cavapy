@@ -139,11 +139,12 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
 
     # Geo-localize
     bbox = geo_localize(country=country, xlim=xlim, ylim=ylim, buffer=buffer)
-    csv_url = "https://hub.ipcc.ifca.es/thredds/fileServer/inventories/cava.csv"
+    csv_url_remote = "https://hub.ipcc.ifca.es/thredds/fileServer/inventories/cava.csv"
+    csv_url_local = "/home/jovyan/shared/inventories/cava/cava.csv"
 
     # Read CSV data into a pandas DataFrame
     pd.options.mode.chained_assignment = None
-    data = pd.read_csv(csv_url)
+    data = pd.read_csv(csv_url) if remote else pd.read_csv(csv_url_local)
     column_to_use = 'location' if remote else 'hub'  # Decide which column to use based on `remote`
     filtered_data = data[
         (data['activity'].str.contains("FAO", na=False)) &
