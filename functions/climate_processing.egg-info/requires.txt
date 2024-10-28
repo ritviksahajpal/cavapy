@@ -1,0 +1,10 @@
+geopandas
+netCDF4
+pandas
+xarray
+numpy
+tqdm
+xclim
+rich
+dask
+shapely

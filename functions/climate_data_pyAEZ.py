@@ -124,6 +124,7 @@ def download_data(url, bbox, variable, obs, years_obs, years_up_to, remote):
 
 def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, years_obs, obs, bias_correction, historical, buffer, xlim, ylim, remote):
     # Validate inputs
+    remote=True
     valid_variables = ["rsds", "tasmax", "tasmin", "pr", "sfcWind", "hurs"]
     valid_domains = ["AFR-22", "EAS-22", "SEA-22", "WAS-22", "AUS-22", "SAM-22", "CAM-22"]
     valid_rcps = ["rcp26", "rcp85"]

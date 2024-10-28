@@ -1,0 +1,7 @@
+README.md
+setup.py
+climate_processing.egg-info/PKG-INFO
+climate_processing.egg-info/SOURCES.txt
+climate_processing.egg-info/dependency_links.txt
+climate_processing.egg-info/requires.txt
+climate_processing.egg-info/top_level.txt
