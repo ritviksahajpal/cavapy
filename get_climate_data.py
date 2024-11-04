@@ -227,7 +227,7 @@ def climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, variable, y
 
 
 # Function to process climate data for multiple variables
-def climate_data_pyAEZ(country, cordex_domain, rcp, gcm, rcm, years_up_to, years_obs: Union[range, None] = None, bias_correction=False, historical=False, obs=False, buffer=0, xlim=None, ylim=None, remote=True, cores=6):
+def get_climate_data(country, cordex_domain, rcp, gcm, rcm, years_up_to, years_obs: Union[range, None] = None, bias_correction=False, historical=False, obs=False, buffer=0, xlim=None, ylim=None, remote=True, cores=6):
     """
     Process climate data required by pyAEZ climate module. The function automatically access CORDEX-CORE models at 0.25° and the ERA5 datasets.
 
