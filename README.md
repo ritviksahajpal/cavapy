@@ -31,9 +31,9 @@ The function can be downloaded from the script folder and imported, for example,
 ```
 import os
 os.chdir('/path/to/function')
-import get_climate_data as cliAEZ
+import climate
 # check documentation
-help(cliAEZ.get_climate_data)
+help(climate.get_climate_data)
 
 ```
 Depending on the interest, downloading climate data can be done in a few different ways. Note that GCM stands for General Circulation Model while RCP stands for Regional Climate Model. As the climate data comes from the CORDEX-CORE initiative, users can choose between 3 different GCMs downscaled with two RCMs. In total, there are six simulations for any given domain (except for CAS-22 where only three are available).
@@ -42,13 +42,13 @@ Since bias-correction requires both the historical run of the CORDEX model and t
 
 ```
 ### Bias-corrected climate projections
-Zambia_climate_data = cliAEZ.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=False, xlim=None, ylim=None, years_obs=None)
+Zambia_climate_data = climate.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=False, xlim=None, ylim=None, years_obs=None)
 ### Non bias-corrected climate projections
-Zambia_climate_data = cliAEZ.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=False, historical=False, xlim=None, ylim=None, years_obs=None)
+Zambia_climate_data = climate.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=False, historical=False, xlim=None, ylim=None, years_obs=None)
 ### Bias-corrected climate projections plus the historical run. This is useful when assessing changes in crop yield from the historical period. In this case, we provide the bias-corrected # historical run of the climate models plus the projections. 
-Zambia_climate_data = cliAEZ.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=True, xlim=None, ylim=None, years_obs=None)
+Zambia_climate_data = climate.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=True, xlim=None, ylim=None, years_obs=None)
 ### Observations only (ERA5)
-Zambia_climate_data = cliAEZ.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=True, bias_correction=True, historical=True, xlim=None, ylim=None, years_obs=range(1980,2019))
+Zambia_climate_data = climate.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=True, bias_correction=True, historical=True, xlim=None, ylim=None, years_obs=range(1980,2019))
 ```
 
 
