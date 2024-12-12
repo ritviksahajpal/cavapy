@@ -133,6 +133,8 @@ def get_climate_data(
     if not obs or years_obs is None:
         # Make sure years_obs is set to default when obs=False
         years_obs = DEFAULT_YEARS_OBS
+        
+    _validate_urls(gcm, rcm, rcp, remote, cordex_domain, obs)    
 
     bbox = _geo_localize(country, xlim, ylim, buffer, cordex_domain)
 
@@ -165,13 +167,59 @@ def get_climate_data(
         }
 
     return results
+def _validate_urls(gcm: str = None, 
+                   rcm: str = None, 
+                   rcp: str = None, 
+                   remote: bool = True, 
+                   cordex_domain: str = None,
+                   obs: bool = False):
+    # Load the data
+    log = logger.getChild("URLs validation")
+    
+    if obs == False:
+        inventory_csv_url = (
+            INVENTORY_DATA_REMOTE_URL if remote else INVENTORY_DATA_LOCAL_PATH
+        )
+        data = pd.read_csv(inventory_csv_url)
+
+        # Set the column to use based on whether the data is remote or local
+        column_to_use = "location" if remote else "hub"
+        
+        # Filter the data based on the conditions
+        filtered_data = data[
+            lambda x: (
+                x["activity"].str.contains("FAO", na=False)
+                & (x["domain"] == cordex_domain)
+                & (x["model"].str.contains(gcm, na=False))
+                & (x["rcm"].str.contains(rcm, na=False))
+                & (x["experiment"].isin([rcp, "historical"]))
+            )
+        ][["experiment", column_to_use]]
+
+        # Extract the column values as a list
+        num_rows = filtered_data.shape[0]
+        column_values = filtered_data[column_to_use]
+
+        if num_rows == 1:
+            # Log the output for one row
+            row1 = column_values.iloc[0]
+            log.info(f"Projections: {row1}")
+        else:
+            # Log the output for two rows
+            row1 = column_values.iloc[0]
+            row2 = column_values.iloc[1]
+            log.info(f"Historical simulation: {row1}")
+            log.info(f"Projections: {row2}")
+    else:  # when obs is True
+        log.info(f"Observations: {ERA5_DATA_REMOTE_URL}")
+
 
 def _geo_localize(
     country: str = None,
     xlim: tuple[float, float] = None,
     ylim: tuple[float, float] = None,
     buffer: int = 0,
-    cordex_domain: str = None,
+    cordex_domain: str = None
 ) -> dict[str, tuple[float, float]]:
     if country:
         if xlim or ylim:
@@ -190,20 +238,20 @@ def _geo_localize(
     xlim = (xlim[0] - buffer, xlim[1] + buffer)
     ylim = (ylim[0] - buffer, ylim[1] + buffer)
 
-    # Always validate CORDEX domain if xlim and ylim are provided
+    # Always validate CORDEX domain
     if cordex_domain:
         _validate_cordex_domain(xlim, ylim, cordex_domain)
 
     return {"xlim": xlim, "ylim": ylim}
 
 def _validate_cordex_domain(xlim, ylim, cordex_domain):
-
+    
     # CORDEX domains data
     cordex_domains_df = pd.DataFrame({
-        "min_lon": [-33,-28.3,89.25, 86.75, 19.25, 44.0, -106.25, -115.0, -24.25, 10.75],
-        "min_lat": [-28,-23,-15.25, -54.25, -15.75, -4.0, -58.25, -14.5, -46.25, 17.75],
-        "max_lon": [20,18,147.0, -152.75, 116.25, -172.0, -16.25, -30.5, 59.75, 140.25],
-        "max_lat": [28,21.7,26.5, 13.75, 45.75, 65.0, 18.75, 28.5, 42.75, 69.75],
+        "min_lon": [-33, -28.3, 89.25, 86.75, 19.25, 44.0, -106.25, -115.0, -24.25, 10.75],
+        "min_lat": [-28, -23, -15.25, -54.25, -15.75, -4.0, -58.25, -14.5, -46.25, 17.75],
+        "max_lon": [20, 18, 147.0, -152.75, 116.25, -172.0, -16.25, -30.5, 59.75, 140.25],
+        "max_lat": [28, 21.7, 26.5, 13.75, 45.75, 65.0, 18.75, 28.5, 42.75, 69.75],
         "cordex_domain": ["NAM-22", "EUR-22", "SEA-22", "AUS-22", "WAS-22", "EAS-22", "SAM-22", "CAM-22", "AFR-22", "CAS-22"]
     })
 
@@ -221,6 +269,7 @@ def _validate_cordex_domain(xlim, ylim, cordex_domain):
         raise ValueError(f"CORDEX domain '{cordex_domain}' is not recognized.")
 
     domain_bbox = domain_row.iloc[0]
+    
     if not is_bbox_contained(user_bbox, domain_bbox):
         suggested_domains = cordex_domains_df[
             cordex_domains_df.apply(lambda row: is_bbox_contained(user_bbox, row), axis=1)
@@ -228,11 +277,12 @@ def _validate_cordex_domain(xlim, ylim, cordex_domain):
 
         if suggested_domains.empty:
             raise ValueError(f"The bounding box {user_bbox} is outside of all available CORDEX domains.")
+        
         suggested_domain = suggested_domains.iloc[0]["cordex_domain"]
+        
         raise ValueError(
             f"Bounding box {user_bbox} is not within '{cordex_domain}'. Suggested domain: '{suggested_domain}'."
         )
-
 
 def process_worker(num_threads, **kwargs) -> xr.DataArray:
     variable = kwargs["variable"]
@@ -278,6 +328,7 @@ def _climate_data_for_variable(
         & (x["rcm"].str.contains(rcm, na=False))
         & (x["experiment"].isin([rcp, "historical"]))
     ][["experiment", column_to_use]]
+    
 
     future_obs = None
     if obs or bias_correction:
