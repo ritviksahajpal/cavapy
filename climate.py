@@ -165,8 +165,13 @@ def get_climate_data(
         results = {
             variable: futures[i].get() for i, variable in enumerate(VALID_VARIABLES)
         }
-
+        
+        pool.close() # Prevent any more tasks from being submitted to the pool
+        pool.join()  # Wait for all worker processes to finish
+      
     return results
+  
+  
 def _validate_urls(gcm: str = None, 
                    rcm: str = None, 
                    rcp: str = None, 
