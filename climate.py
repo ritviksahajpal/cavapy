@@ -4,12 +4,17 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import logging
 import warnings
-warnings.filterwarnings("ignore", category=FutureWarning, message=".*geopandas.dataset module is deprecated.*")
-import geopandas as gpd
-import pandas as pd
-import xarray as xr
-import numpy as np
-from xclim import sdba
+
+warnings.filterwarnings(
+    "ignore",
+    category=FutureWarning,
+    message=".*geopandas.dataset module is deprecated.*",
+)
+import geopandas as gpd  # noqa: E402
+import pandas as pd  # noqa: E402
+import xarray as xr  # noqa: E402
+import numpy as np  # noqa: E402
+from xclim import sdba  # noqa: E402
 
 
 logger = logging.getLogger("climate")
@@ -34,7 +39,17 @@ VARIABLES_MAP = {
 }
 VALID_VARIABLES = list(VARIABLES_MAP)
 # TODO: Throw an error if the selected country is not in the selected domain
-VALID_DOMAINS = ["NAM-22","EUR-22","AFR-22", "EAS-22", "SEA-22", "WAS-22", "AUS-22", "SAM-22", "CAM-22"]
+VALID_DOMAINS = [
+    "NAM-22",
+    "EUR-22",
+    "AFR-22",
+    "EAS-22",
+    "SEA-22",
+    "WAS-22",
+    "AUS-22",
+    "SAM-22",
+    "CAM-22",
+]
 VALID_RCPS = ["rcp26", "rcp85"]
 VALID_GCM = ["MOHC", "MPI", "NCC"]
 VALID_RCM = ["REMO", "Reg"]
@@ -133,8 +148,8 @@ def get_climate_data(
     if not obs or years_obs is None:
         # Make sure years_obs is set to default when obs=False
         years_obs = DEFAULT_YEARS_OBS
-        
-    _validate_urls(gcm, rcm, rcp, remote, cordex_domain, obs)    
+
+    _validate_urls(gcm, rcm, rcp, remote, cordex_domain, obs)
 
     bbox = _geo_localize(country, xlim, ylim, buffer, cordex_domain)
 
@@ -165,23 +180,25 @@ def get_climate_data(
         results = {
             variable: futures[i].get() for i, variable in enumerate(VALID_VARIABLES)
         }
-        
-        pool.close() # Prevent any more tasks from being submitted to the pool
+
+        pool.close()  # Prevent any more tasks from being submitted to the pool
         pool.join()  # Wait for all worker processes to finish
-      
+
     return results
-  
-  
-def _validate_urls(gcm: str = None, 
-                   rcm: str = None, 
-                   rcp: str = None, 
-                   remote: bool = True, 
-                   cordex_domain: str = None,
-                   obs: bool = False):
+
+
+def _validate_urls(
+    gcm: str = None,
+    rcm: str = None,
+    rcp: str = None,
+    remote: bool = True,
+    cordex_domain: str = None,
+    obs: bool = False,
+):
     # Load the data
     log = logger.getChild("URLs validation")
-    
-    if obs == False:
+
+    if obs is False:
         inventory_csv_url = (
             INVENTORY_DATA_REMOTE_URL if remote else INVENTORY_DATA_LOCAL_PATH
         )
@@ -189,7 +206,7 @@ def _validate_urls(gcm: str = None,
 
         # Set the column to use based on whether the data is remote or local
         column_to_use = "location" if remote else "hub"
-        
+
         # Filter the data based on the conditions
         filtered_data = data[
             lambda x: (
@@ -224,11 +241,13 @@ def _geo_localize(
     xlim: tuple[float, float] = None,
     ylim: tuple[float, float] = None,
     buffer: int = 0,
-    cordex_domain: str = None
+    cordex_domain: str = None,
 ) -> dict[str, tuple[float, float]]:
     if country:
         if xlim or ylim:
-            raise ValueError("Specify either a country or bounding box limits (xlim, ylim), but not both.")
+            raise ValueError(
+                "Specify either a country or bounding box limits (xlim, ylim), but not both."
+            )
         # Load country shapefile and extract bounds
         world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
         country_shp = world[world.name == country]
@@ -237,7 +256,9 @@ def _geo_localize(
         bounds = country_shp.total_bounds  # [minx, miny, maxx, maxy]
         xlim, ylim = (bounds[0], bounds[2]), (bounds[1], bounds[3])
     elif not (xlim and ylim):
-        raise ValueError("Either a country or bounding box limits (xlim, ylim) must be specified.")
+        raise ValueError(
+            "Either a country or bounding box limits (xlim, ylim) must be specified."
+        )
 
     # Apply buffer
     xlim = (xlim[0] - buffer, xlim[1] + buffer)
@@ -249,23 +270,72 @@ def _geo_localize(
 
     return {"xlim": xlim, "ylim": ylim}
 
+
 def _validate_cordex_domain(xlim, ylim, cordex_domain):
-    
+
     # CORDEX domains data
-    cordex_domains_df = pd.DataFrame({
-        "min_lon": [-33, -28.3, 89.25, 86.75, 19.25, 44.0, -106.25, -115.0, -24.25, 10.75],
-        "min_lat": [-28, -23, -15.25, -54.25, -15.75, -4.0, -58.25, -14.5, -46.25, 17.75],
-        "max_lon": [20, 18, 147.0, -152.75, 116.25, -172.0, -16.25, -30.5, 59.75, 140.25],
-        "max_lat": [28, 21.7, 26.5, 13.75, 45.75, 65.0, 18.75, 28.5, 42.75, 69.75],
-        "cordex_domain": ["NAM-22", "EUR-22", "SEA-22", "AUS-22", "WAS-22", "EAS-22", "SAM-22", "CAM-22", "AFR-22", "CAS-22"]
-    })
+    cordex_domains_df = pd.DataFrame(
+        {
+            "min_lon": [
+                -33,
+                -28.3,
+                89.25,
+                86.75,
+                19.25,
+                44.0,
+                -106.25,
+                -115.0,
+                -24.25,
+                10.75,
+            ],
+            "min_lat": [
+                -28,
+                -23,
+                -15.25,
+                -54.25,
+                -15.75,
+                -4.0,
+                -58.25,
+                -14.5,
+                -46.25,
+                17.75,
+            ],
+            "max_lon": [
+                20,
+                18,
+                147.0,
+                -152.75,
+                116.25,
+                -172.0,
+                -16.25,
+                -30.5,
+                59.75,
+                140.25,
+            ],
+            "max_lat": [28, 21.7, 26.5, 13.75, 45.75, 65.0, 18.75, 28.5, 42.75, 69.75],
+            "cordex_domain": [
+                "NAM-22",
+                "EUR-22",
+                "SEA-22",
+                "AUS-22",
+                "WAS-22",
+                "EAS-22",
+                "SAM-22",
+                "CAM-22",
+                "AFR-22",
+                "CAS-22",
+            ],
+        }
+    )
 
     def is_bbox_contained(bbox, domain):
         """Check if bbox is contained within the domain bounding box."""
-        return (bbox[0] >= domain["min_lon"] and
-                bbox[1] >= domain["min_lat"] and
-                bbox[2] <= domain["max_lon"] and
-                bbox[3] <= domain["max_lat"])
+        return (
+            bbox[0] >= domain["min_lon"]
+            and bbox[1] >= domain["min_lat"]
+            and bbox[2] <= domain["max_lon"]
+            and bbox[3] <= domain["max_lat"]
+        )
 
     user_bbox = [xlim[0], ylim[0], xlim[1], ylim[1]]
     domain_row = cordex_domains_df[cordex_domains_df["cordex_domain"] == cordex_domain]
@@ -274,20 +344,25 @@ def _validate_cordex_domain(xlim, ylim, cordex_domain):
         raise ValueError(f"CORDEX domain '{cordex_domain}' is not recognized.")
 
     domain_bbox = domain_row.iloc[0]
-    
+
     if not is_bbox_contained(user_bbox, domain_bbox):
         suggested_domains = cordex_domains_df[
-            cordex_domains_df.apply(lambda row: is_bbox_contained(user_bbox, row), axis=1)
+            cordex_domains_df.apply(
+                lambda row: is_bbox_contained(user_bbox, row), axis=1
+            )
         ]
 
         if suggested_domains.empty:
-            raise ValueError(f"The bounding box {user_bbox} is outside of all available CORDEX domains.")
-        
+            raise ValueError(
+                f"The bounding box {user_bbox} is outside of all available CORDEX domains."
+            )
+
         suggested_domain = suggested_domains.iloc[0]["cordex_domain"]
-        
+
         raise ValueError(
             f"Bounding box {user_bbox} is not within '{cordex_domain}'. Suggested domain: '{suggested_domain}'."
         )
+
 
 def process_worker(num_threads, **kwargs) -> xr.DataArray:
     variable = kwargs["variable"]
@@ -333,7 +408,6 @@ def _climate_data_for_variable(
         & (x["rcm"].str.contains(rcm, na=False))
         & (x["experiment"].isin([rcp, "historical"]))
     ][["experiment", column_to_use]]
-    
 
     future_obs = None
     if obs or bias_correction:
