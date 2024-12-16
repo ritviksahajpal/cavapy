@@ -1,9 +1,16 @@
 [tool.poetry]
-name = "pyaez-climate-module"
+name = "cavapy"
 version = "0.1.0"
-description = "\"Retrieve climate data for pyAEZ\""
+description = "CAVA Python package. Retrive and analyze climate data."
 authors = ["Riccardo Soldan <riccardosoldan@hotmail.it>", "Oleh Lokshyn <olokshyn@gmail.com>"]
 readme = "README.md"
+license = "MIT"
+repository = "https://github.com/Risk-Team/cavapy"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
