@@ -27,6 +27,9 @@ cavapy can be installed with pip. Ensure that you are not using a python version
 conda create -n test python=3.11
 conda activate test
 pip install cavapy
+conda activate test
+python
+import cavapy
 
 ```
 ## Example usage
