@@ -21,7 +21,7 @@ Available variables are:
 
 
 ## Installation
-cavapy can be installed with pip. ENsure that you are not using a python version > 13. 
+cavapy can be installed with pip. Ensure that you are not using a python version > 13. 
 
 ```
 conda create -n test python=3.11
