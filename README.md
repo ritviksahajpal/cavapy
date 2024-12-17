@@ -39,11 +39,13 @@ Since bias-correction requires both the historical run of the CORDEX model and t
 
 ### Bias-corrected climate projections
 ```
+import cavapy
 Zambia_climate_data = cavapy.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=False)
 ```
 ### Non bias-corrected climate projections
 
 ```
+import cavapy
 Zambia_climate_data = cavapy.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=False, historical=False)
 ```
 ### Bias-corrected climate projections plus the historical run. 
@@ -51,10 +53,12 @@ Zambia_climate_data = cavapy.get_climate_data(country="Zambia", cordex_domain="A
 This is useful when assessing changes in crop yield from the historical period. In this case, we provide the bias-corrected # historical run of the climate models plus the projections. 
 
 ```
+import cavapy
 Zambia_climate_data = cavapy.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=True)
 ```
 ### Observations only (ERA5)
 
 ```
+import cavapy
 Zambia_climate_data = cavapy.get_climate_data(country="Zambia", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=True, bias_correction=True, historical=True, years_obs=range(1980,2019))
 ```
