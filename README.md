@@ -32,6 +32,14 @@ python
 import cavapy
 
 ```
+## Process
+
+The get_climate_data function performs automatically:
+- Data retrieval in parallel
+- Unit conversion
+- Convert into a Gregorian calendar (CORDEX-CORE models do not have a full 365 days calendar) through linear interpolation
+- Bias correction using the empirical quantile mapping (optional)
+
 ## Example usage
 
 Depending on the interest, downloading climate data can be done in a few different ways. Note that GCM stands for General Circulation Model while RCP stands for Regional Climate Model. As the climate data comes from the CORDEX-CORE initiative, users can choose between 3 different GCMs downscaled with two RCMs. In total, there are six simulations for any given domain (except for CAS-22 where only three are available).
