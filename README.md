@@ -10,14 +10,14 @@ The currently available data is:
 - CORDEX-CORE simulations (3 GCMs donwscaled with 2 RCMs for two RCPs)
 - W5E5 and ERA5 datasets
   
-Available variables are:
+Available variables:
 
-- Daily maximum temperature (tasmax)
-- Daily minimum temperature (tasmin)
-- Daily precipitation (pr)
-- Daily relative humidity (hurs)
-- Daily wind speed (sfcWind)
-- Daily solar radiation (rsds)
+- Daily maximum temperature (tasmax) (°C)
+- Daily minimum temperature (tasmin) (°C)
+- Daily precipitation (pr) (mm)
+- Daily relative humidity (hurs) (%)
+- Daily wind speed (sfcWind) (2 m level m/s)
+- Daily solar radiation (rsds) (W/m^2)
 
 
 ## Installation
