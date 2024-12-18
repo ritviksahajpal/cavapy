@@ -50,7 +50,7 @@ Zambia_climate_data = cavapy.get_climate_data(country="Zambia", cordex_domain="A
 ```
 ### Bias-corrected climate projections plus the historical run
 
-This is useful when assessing changes in crop yield from the historical period. In this case, we provide the bias-corrected # historical run of the climate models plus the projections. 
+This is useful when assessing changes in crop yield from the historical period. In this case, we provide the bias-corrected historical run of the climate models plus the bias-corrected projections. 
 
 ```
 import cavapy
