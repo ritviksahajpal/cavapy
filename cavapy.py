@@ -513,7 +513,7 @@ def _download_data(
     remote: bool,
 ) -> xr.DataArray:
     log = logger.getChild(variable)
-    dataset = "projection" if "rcp" in url else "historical"
+    tempo = "projection" if "rcp" in url else "historical"
     if obs:
         var = VARIABLES_MAP[variable]
         log.info(f"Downloading observational data for {variable}({var})")
@@ -561,9 +561,9 @@ def _download_data(
         )
 
     else:
-        log.info(f"Downloading CORDEX data for {variable}-{dataset}")
+        log.info(f"Downloading CORDEX data for {variable}-{tempo}")
         ds_var = xr.open_dataset(url)[variable]
-        log.info(f"CORDEX data for {variable}-{dataset} has been downloaded")
+        log.info(f"CORDEX data for {variable}-{tempo} has been downloaded")
         ds_cropped = ds_var.sel(
             longitude=slice(bbox["xlim"][0], bbox["xlim"][1]),
             latitude=slice(bbox["ylim"][1], bbox["ylim"][0]),
@@ -605,7 +605,7 @@ def _download_data(
     assert isinstance(ds_cropped, xr.DataArray)
 
     log.info(
-        f"{'Observational' if obs else 'CORDEX'} data for {variable} has been processed"
+         f"{'Observational' if obs else f'CORDEX-{tempo}'} data for {variable} has been processed"
     )
 
     return ds_cropped
