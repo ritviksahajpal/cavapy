@@ -438,15 +438,12 @@ def _climate_data_for_variable(
 
         # Add the downloaded models to the DataFrame
         filtered_data["models"] = downloaded_models
-        log.info("Interpolating missing values")
         hist = (
             filtered_data["models"].iloc[0].interpolate_na(dim="time", method="linear")
         )
         proj = (
             filtered_data["models"].iloc[1].interpolate_na(dim="time", method="linear")
         )
-        log.info("Missing values interpolated")
-
         if bias_correction and historical:
             # Load observations for bias correction
             ref = future_obs.result()
@@ -516,6 +513,7 @@ def _download_data(
     remote: bool,
 ) -> xr.DataArray:
     log = logger.getChild(variable)
+    dataset = "projection" if "rcp" in url else "historical"
     if obs:
         var = VARIABLES_MAP[variable]
         log.info(f"Downloading observational data for {variable}({var})")
@@ -563,9 +561,9 @@ def _download_data(
         )
 
     else:
-        log.info(f"Downloading CORDEX data for {variable}")
+        log.info(f"Downloading CORDEX data for {variable}-{dataset}")
         ds_var = xr.open_dataset(url)[variable]
-        log.info(f"CORDEX data for {variable} has been downloaded")
+        log.info(f"CORDEX data for {variable}-{dataset} has been downloaded")
         ds_cropped = ds_var.sel(
             longitude=slice(bbox["xlim"][0], bbox["xlim"][1]),
             latitude=slice(bbox["ylim"][1], bbox["ylim"][0]),
@@ -596,10 +594,7 @@ def _download_data(
         ds_cropped = ds_cropped.convert_calendar(
             calendar="gregorian", missing=np.nan, align_on="date"
         )
-        log.debug(
-            "360-calendar converted into Gregorian calendar and missing values linearly interpolated"
-        )
-
+       
         time_mask = (ds_cropped["time"].dt.year >= years[0]) & (
             ds_cropped["time"].dt.year <= years[-1]
         )
