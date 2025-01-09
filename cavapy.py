@@ -516,12 +516,12 @@ def _download_data(
     tempo = "projection" if "rcp" in url else "historical"
     if obs:
         var = VARIABLES_MAP[variable]
-        log.info(f"Downloading observational data for {variable}({var})")
+        log.info(f"Opening ERA5 dataset for {variable}({var})")
         if remote:
             ds_var = xr.open_dataset(ERA5_DATA_REMOTE_URL)[var]
         else:
             ds_var = xr.open_dataset(ERA5_DATA_LOCAL_PATH)[var]
-        log.info(f"Observational data for {variable}({var}) has been downloaded")
+        log.info(f"ERA5 dataset for {variable}({var}) has been opened")
 
         # Coordinate normalization and renaming for 'hurs'
         if var == "hurs":
