@@ -561,9 +561,9 @@ def _download_data(
         )
 
     else:
-        log.info(f"Downloading CORDEX data for {variable}-{tempo}")
+        log.info(f"Opening CORDEX dataset for {variable}-{tempo}")
         ds_var = xr.open_dataset(url)[variable]
-        log.info(f"CORDEX data for {variable}-{tempo} has been downloaded")
+        log.info(f"CORDEX dataset for {variable}-{tempo} has been opened")
         ds_cropped = ds_var.sel(
             longitude=slice(bbox["xlim"][0], bbox["xlim"][1]),
             latitude=slice(bbox["ylim"][1], bbox["ylim"][0]),
