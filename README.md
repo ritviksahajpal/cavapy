@@ -1,24 +1,42 @@
-# Introduction
-cavapy is a Python library that allows retrieval of climate data hosted in THREDDS servers at the University of Cantabria thanks to the [CAVA project](https://risk-team.github.io/CAVAanalytics/articles/CAVA.html). 
+# cavapy: Climate Data Access Simplified
 
-## Data source
-The climate data is available at the THREDDS data server of the University of Cantabria as part of the CAVA (Climate and Agriculture Risk Visualization and Assessment) product developed by FAO, the University of Cantabria, the University of Cape Town and Predictia. 
-CAVA has available CORDEX-CORE climate models, the high resolution (25 Km) dynamically-downscaled climate models used in the IPCC report AR5. Additionally, CAVA  offers access to state-of-the-art reanalyses datasets, such as ERA5 and the observational dataset W5E5 v2.
+## Introduction
 
-The currently available data is:
+`cavapy` is a Python library designed to streamline the retrieval of CORDEX-CORE climate models hosted on THREDDS servers at the University of Cantabria. Using the Open-source Project for a Network Data Access Protocol (**OPeNDAP**), users can directly access and subset datasets without the need to download large NetCDF files. This capability is part of the Climate and Agriculture Risk Visualization and Assessment (CAVA) [project](https://risk-team.github.io/CAVAanalytics/articles/CAVA.html), which focuses on providing high-resolution climate data for scientific, environmental, and agricultural applications.
 
-- CORDEX-CORE simulations (3 GCMs donwscaled with 2 RCMs for two RCPs)
-- W5E5 and ERA5 datasets
-  
-Available variables:
+With `cavapy`, users can efficiently integrate CORDEX-CORE data into their workflows, making it an ideal resource for hydrological and crop modeling, among other climate-sensitive analyses. Additionally, `cavapy` enables bias correction, potentially enhancing the precision and usability of the data for a wide range of applications.
 
-- Daily maximum temperature (tasmax) (°C)
-- Daily minimum temperature (tasmin) (°C)
-- Daily precipitation (pr) (mm)
-- Daily relative humidity (hurs) (%)
-- Daily wind speed (sfcWind) (2 m level m/s)
-- Daily solar radiation (rsds) (W/m^2)
+---
 
+## Data Source
+
+The climate data provided by `cavapy` is hosted on the THREDDS data server of the University of Cantabria as part of the CAVA project. CAVA is a collaborative effort by FAO, the University of Cantabria, the University of Cape Town, and Predictia, aimed at democratising accessibility and usability of climate information.
+
+### Key Datasets:
+- **CORDEX-CORE Simulations**: Dynamically downscaled high-resolution (25 km) climate models, used in the IPCC AR5 report, featuring simulations from:
+  - 3 Global Climate Models (GCMs)
+  - 2 Regional Climate Models (RCMs)
+  - Two Representative Concentration Pathways (RCPs: RCP4.5 and RCP8.5)
+- **Reanalyses and Observational Datasets**:
+  - ERA5
+  - W5E5 v2
+
+These datasets provide robust inputs for climate and environmental modeling, supporting scientific and policy-driven decision-making.
+
+---
+
+## Available Variables
+
+`cavapy` grants access to critical climate variables, enabling integration into diverse modeling frameworks. The variables currently available include:
+
+- **Daily Maximum Temperature (tasmax)**: °C  
+- **Daily Minimum Temperature (tasmin)**: °C  
+- **Daily Precipitation (pr)**: mm  
+- **Daily Relative Humidity (hurs)**: %  
+- **Daily Wind Speed (sfcWind)**: 2 m level, m/s  
+- **Daily Solar Radiation (rsds)**: W/m²  
+
+---
 
 ## Installation
 cavapy can be installed with pip. Ensure that you are not using a python version > 13. 
