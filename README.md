@@ -62,6 +62,8 @@ Since bias-correction requires both the historical run of the CORDEX model and t
 It takes about 10 minutes to run each of the tasks below. For bigger areas/country, the computational time increases. For example, for Zambia it takes about 30 minutes.
 
 ### Bias-corrected climate projections
+By default all available climate variables are used. You can specify a subset with the variable argument
+
 ```
 import cavapy
 Togo_climate_data = cavapy.get_climate_data(country="Togo", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=False)
