@@ -39,7 +39,7 @@ These datasets provide robust inputs for climate and environmental modeling, sup
 ---
 
 ## Installation
-cavapy can be installed with pip. Ensure that you are not using a python version > 13. 
+cavapy can be installed with pip. Ensure that you are not using a python version > 3. 
 
 ```
 conda create -n test python=3.11
