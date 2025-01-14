@@ -1,4 +1,4 @@
-# cavapy: Climate Data Access Simplified
+# cavapy: CORDEX-CORE Climate Data Access Simplified
 
 ## Introduction
 
