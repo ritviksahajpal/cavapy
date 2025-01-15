@@ -161,7 +161,7 @@ def get_climate_data(
     else:
         variables = VALID_VARIABLES
 
-    _validate_urls(gcm, rcm, rcp, remote, cordex_domain, obs)
+    _validate_urls(gcm, rcm, rcp, remote, cordex_domain, obs, historical, bias_correction)
 
     bbox = _geo_localize(country, xlim, ylim, buffer, cordex_domain)
 
@@ -206,6 +206,8 @@ def _validate_urls(
     remote: bool = True,
     cordex_domain: str = None,
     obs: bool = False,
+    historical: bool = False,
+    bias_correction: bool = False,
 ):
     # Load the data
     log = logger.getChild("URL-validation")
@@ -219,6 +221,11 @@ def _validate_urls(
         # Set the column to use based on whether the data is remote or local
         column_to_use = "location" if remote else "hub"
 
+        # Define which experiments we need
+        experiments = [rcp]
+        if historical or bias_correction:
+            experiments.append("historical")
+
         # Filter the data based on the conditions
         filtered_data = data[
             lambda x: (
@@ -226,27 +233,19 @@ def _validate_urls(
                 & (x["domain"] == cordex_domain)
                 & (x["model"].str.contains(gcm, na=False))
                 & (x["rcm"].str.contains(rcm, na=False))
-                & (x["experiment"].isin([rcp, "historical"]))
+                & (x["experiment"].isin(experiments))
             )
         ][["experiment", column_to_use]]
 
         # Extract the column values as a list
-        num_rows = filtered_data.shape[0]
-        column_values = filtered_data[column_to_use]
+        for _, row in filtered_data.iterrows():
+            if row["experiment"] == "historical":
+                log_hist = logger.getChild("URL-validation-historical")
+                log_hist.info(f"{row[column_to_use]}")
+            else:
+                log_proj = logger.getChild("URL-validation-projections")
+                log_proj.info(f"{row[column_to_use]}")
 
-        if num_rows == 1:
-            # Log the output for one row
-            row1 = column_values.iloc[0]
-            log_proj = logger.getChild("URL-validation-projections")
-            log_proj.info(f"{row1}")
-        else:
-            # Log the output for two rows
-            row1 = column_values.iloc[0]
-            row2 = column_values.iloc[1]
-            log_hist = logger.getChild("URL-validation-historical")
-            log_proj = logger.getChild("URL-validation-projections")
-            log_hist.info(f"{row1}")
-            log_proj.info(f"{row2}")
     else:  # when obs is True
         log_obs = logger.getChild("URL-validation-observations")
         log_obs.info(f"{ERA5_DATA_REMOTE_URL}")
@@ -417,12 +416,18 @@ def _climate_data_for_variable(
     )
     data = pd.read_csv(inventory_csv_url)
     column_to_use = "location" if remote else "hub"
+    
+    # Filter data based on whether we need historical data
+    experiments = [rcp]
+    if historical or bias_correction:
+        experiments.append("historical")
+        
     filtered_data = data[
         lambda x: (x["activity"].str.contains("FAO", na=False))
         & (x["domain"] == cordex_domain)
         & (x["model"].str.contains(gcm, na=False))
         & (x["rcm"].str.contains(rcm, na=False))
-        & (x["experiment"].isin([rcp, "historical"]))
+        & (x["experiment"].isin(experiments))
     ][["experiment", column_to_use]]
 
     future_obs = None
@@ -454,12 +459,13 @@ def _climate_data_for_variable(
 
         # Add the downloaded models to the DataFrame
         filtered_data["models"] = downloaded_models
-        hist = (
-            filtered_data["models"].iloc[0].interpolate_na(dim="time", method="linear")
-        )
-        proj = (
-            filtered_data["models"].iloc[1].interpolate_na(dim="time", method="linear")
-        )
+        
+        if historical or bias_correction:
+            hist = filtered_data[filtered_data["experiment"] == "historical"]["models"].iloc[0].interpolate_na(dim="time", method="linear")
+            proj = filtered_data[filtered_data["experiment"] == rcp]["models"].iloc[0].interpolate_na(dim="time", method="linear")
+        else:
+            proj = filtered_data["models"].iloc[0].interpolate_na(dim="time", method="linear")
+            
         if bias_correction and historical:
             # Load observations for bias correction
             ref = future_obs.result()
