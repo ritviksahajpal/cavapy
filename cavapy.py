@@ -461,10 +461,14 @@ def _climate_data_for_variable(
         filtered_data["models"] = downloaded_models
         
         if historical or bias_correction:
-            hist = filtered_data[filtered_data["experiment"] == "historical"]["models"].iloc[0].interpolate_na(dim="time", method="linear")
-            proj = filtered_data[filtered_data["experiment"] == rcp]["models"].iloc[0].interpolate_na(dim="time", method="linear")
+            hist = filtered_data[filtered_data["experiment"] == "historical"]["models"].iloc[0]
+            proj = filtered_data[filtered_data["experiment"] == rcp]["models"].iloc[0]
+            
+            hist = hist.interpolate_na(dim="time", method="linear")
+            proj = proj.interpolate_na(dim="time", method="linear")
         else:
-            proj = filtered_data["models"].iloc[0].interpolate_na(dim="time", method="linear")
+            proj = filtered_data["models"].iloc[0]
+            proj = proj.interpolate_na(dim="time", method="linear")
             
         if bias_correction and historical:
             # Load observations for bias correction
@@ -587,6 +591,14 @@ def _download_data(
     else:
         log.info(f"Establishing connection to CORDEX data for {variable}")
         ds_var = xr.open_dataset(url)[variable]
+        
+        # Check if time dimension has a prefix, indicating variable is not available
+        time_dims = [dim for dim in ds_var.dims if dim.startswith('time_')]
+        if time_dims:
+            msg = f"Variable {variable} is not available for this model: {url}"
+            log.exception(msg)
+            raise ValueError(msg)
+            
         log.info(f"Connection to CORDEX data for {variable} has been established")
         ds_cropped = ds_var.sel(
             longitude=slice(bbox["xlim"][0], bbox["xlim"][1]),
@@ -642,14 +654,15 @@ def _download_data(
 
 if __name__ == "__main__":
     data = get_climate_data(
-        country="Zambia",
+        country="Togo",
+        variables=["hurs"],
         cordex_domain="AFR-22",
         rcp="rcp26",
         gcm="MPI",
-        rcm="REMO",
+        rcm="Reg",
         years_up_to=2030,
         obs=False,
-        bias_correction=True,
+        bias_correction=False,
         historical=False,
     )
     print(data)
