@@ -1,4 +1,13 @@
-# cavapy: CORDEX-CORE Climate Data Access Simplified
+<h1 align="center">
+<img src="man/figures/sticker2.png" width = "300" height = "300" align="center" />
+  <br>
+  <h5 align="center">cavapy: CORDEX-CORE Climate Data Access Simplified</h5>
+  <br>
+<div align="center">
+   <img src="https://img.shields.io/pypi/dm/cavapy" alt="Downloads" style="display: inline-block;">
+   <img src="https://img.shields.io/github/release-date-pre/Risk-team/cavapy" alt="release date" style="display: inline-block;">
+</div>
+</h1
 
 ## Introduction
 
