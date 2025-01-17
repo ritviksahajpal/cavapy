@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <h5 align="center">cavapy: CORDEX-CORE Climate Data Access Simplified</h10>
+  <h2 align="center">cavapy: CORDEX-CORE Climate Data Access Simplified</h2>
   <br>
 <div align="center">
    <img src="https://img.shields.io/pypi/dm/cavapy" alt="Downloads" style="display: inline-block;">
