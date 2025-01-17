@@ -76,13 +76,13 @@ It takes about 10 minutes to run each of the tasks below. For bigger areas/count
 
 ```
 import cavapy
-Togo_climate_data = cavapy.get_climate_data(country="Togo", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=False)
+Togo_climate_data = cavapy.get_climate_data(country="Togo", variables=["tasmax", "pr"], cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=False)
 ```
 ### Non bias-corrected climate projections
 
 ```
 import cavapy
-Togo_climate_data = cavapy.get_climate_data(country="Togo", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=False, historical=False)
+Togo_climate_data = cavapy.get_climate_data(country="Togo",variables=["tasmax", "pr"], cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=False, historical=False)
 ```
 ### Bias-corrected climate projections plus the historical run
 
@@ -90,11 +90,11 @@ This is useful when assessing changes in crop yield from the historical period. 
 
 ```
 import cavapy
-Togo_climate_data = cavapy.get_climate_data(country="Togo", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=True)
+Togo_climate_data = cavapy.get_climate_data(country="Togo", variables=["tasmax", "pr"], cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=True)
 ```
 ### Observations only (ERA5)
 
 ```
 import cavapy
-Togo_climate_data = cavapy.get_climate_data(country="Togo", cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=True, bias_correction=True, historical=True, years_obs=range(1980,2019))
+Togo_climate_data = cavapy.get_climate_data(country="Togo", cordex_domain="AFR-22",variables=["tasmax", "pr"], rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=True, bias_correction=True, historical=True, years_obs=range(1980,2019))
 ```
