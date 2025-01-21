@@ -4,7 +4,7 @@
   <br>
 <div align="center">
    <img src="https://img.shields.io/pepy/dt/cavapy?style=plastic" alt="Downloads" style="display: inline-block;">
-   <img src="https://img.shields.io/github/release-date-pre/Risk-team/cavapy" alt="release date" style="display: inline-block;">
+   <img src="https://img.shields.io/pypi/v/cavapy?label=pypi%20package" alt="version" style="display: inline-block;">
 </div>
 </h1
 
