@@ -34,7 +34,7 @@ The climate data provided by `cavapy` is hosted on the THREDDS data server of th
 - **CORDEX-CORE Simulations**: Dynamically downscaled high-resolution (25 km) climate models, used in the IPCC AR5 report, featuring simulations from:
   - 3 Global Climate Models (GCMs)
   - 2 Regional Climate Models (RCMs)
-  - Two Representative Concentration Pathways (RCPs: RCP4.5 and RCP8.5)
+  - Two Representative Concentration Pathways (RCPs: RCP2.6 and RCP8.5)
 - **Reanalyses and Observational Datasets**:
   - ERA5
   - W5E5 v2
