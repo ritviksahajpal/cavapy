@@ -25,21 +25,17 @@
 With `cavapy`, users can efficiently integrate CORDEX-CORE data into their workflows, making it an ideal resource for hydrological and crop modeling, among other climate-sensitive analyses. Additionally, `cavapy` enables bias correction, potentially enhancing the precision and usability of the data for a wide range of applications.
 
 
-
 ## Data Source
 
 The climate data provided by `cavapy` is hosted on the THREDDS data server of the University of Cantabria as part of the CAVA project. CAVA is a collaborative effort by FAO, the University of Cantabria, the University of Cape Town, and Predictia, aimed at democratising accessibility and usability of climate information.
 
-### Key Datasets:
+### Available Datasets via capapy:
 - **CORDEX-CORE Simulations**: Dynamically downscaled high-resolution (25 km) climate models, used in the IPCC AR5 report, featuring simulations from:
   - 3 Global Climate Models (GCMs)
   - 2 Regional Climate Models (RCMs)
   - Two Representative Concentration Pathways (RCPs: RCP2.6 and RCP8.5)
 - **Reanalyses and Observational Datasets**:
   - ERA5
-  - W5E5 v2
-
-These datasets provide robust inputs for climate and environmental modeling, supporting scientific and policy-driven decision-making.
 
 ---
 
