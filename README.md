@@ -34,8 +34,8 @@ The climate data provided by `cavapy` is hosted on the THREDDS data server of th
   - 3 Global Climate Models (GCMs)
   - 2 Regional Climate Models (RCMs)
   - Two Representative Concentration Pathways (RCPs: RCP2.6 and RCP8.5)
-- **Reanalyses and Observational Datasets**:
-  - ERA5
+- **Reanalyses Dataset**:
+  - ERA5 (used for the optional bias correction of the CORDEX-CORE projections)
 
 ---
 
