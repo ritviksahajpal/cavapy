@@ -70,10 +70,10 @@ The get_climate_data function performs automatically:
 
 ## Example usage
 
-Depending on the interest, downloading climate data can be done in a few different ways. Note that GCM stands for General Circulation Model while RCP stands for Regional Climate Model. As the climate data comes from the CORDEX-CORE initiative, users can choose between 3 different GCMs downscaled with two RCMs. In total, there are six simulations for any given domain (except for CAS-22 where only three are available).
+Depending on the interest, downloading climate data can be done in a few different ways. Note that GCM stands for General Circulation Model while RCM stands for Regional Climate Model. As the climate data comes from the CORDEX-CORE initiative, users can choose between 3 different GCMs downscaled with two RCMs. In total, there are six simulations for any given domain (except for CAS-22 where only three are available).
 Since bias-correction requires both the historical run of the CORDEX model and the observational dataset (in this case ERA5), even when the historical argument is set to False, the historical run will be used for learning the bias correction factor.
 
-It takes about 10 minutes to run each of the tasks below. For bigger areas/country, the computational time increases. For example, for Zambia it takes about 30 minutes.
+It takes about 10 minutes to run each of the tasks below. For bigger areas/country, the computational time increases.
 
 ### Bias-corrected climate projections
 **By default all available climate variables are used. You can specify a subset with the variable argument**
