@@ -5,6 +5,7 @@
 <div align="center">
    <img src="https://img.shields.io/pepy/dt/cavapy?style=plastic" alt="Downloads" style="display: inline-block;">
    <img src="https://img.shields.io/pypi/v/cavapy?label=pypi%20package" alt="version" style="display: inline-block;">
+   <img src="https://img.shields.io/badge/python-3.12-brightgreen" alt="version" style="display: inline-block;">
 </div>
 </h1
 
