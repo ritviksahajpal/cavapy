@@ -80,6 +80,7 @@ It takes about 10 minutes to run each of the tasks below. For bigger areas/count
 ### Bias-corrected climate projections
 **By default all available climate variables are used. You can specify a subset with the variable argument**
 
+Note that bias correction is automatically performed with empirical quantile mapping on a monthly basis to account for seasonality.
 ```
 import cavapy
 Togo_climate_data = cavapy.get_climate_data(country="Togo", variables=["tasmax", "pr"], cordex_domain="AFR-22", rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=False, bias_correction=True, historical=False)
