@@ -15,7 +15,7 @@
 --------------------------------------------------------------------------------------------------
 **Check GitHub issues for known servers' downtimes**
 
-**We will release Bias corrected CORDEX-CORE simulations with the ISIMIP methodology in 2025**
+**We will release bias-corrected CORDEX-CORE simulations with the ISIMIP methodology in 2025. This will allow non-expert users to directly use these datasets and avoid the need for custom bias-correction**
 
 --------------------------------------------------------------------------------------------------
 
