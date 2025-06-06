@@ -72,15 +72,15 @@ DEFAULT_YEARS_OBS = range(1980, 2006)
 def get_climate_data(
     *,
     country: str | None,
-    cordex_domain: str,
-    rcp: str,
-    gcm: str,
-    rcm: str,
-    years_up_to: int,
     years_obs: range | None = None,
+    obs: bool = False,
+    cordex_domain: str | None = None,
+    rcp: str | None = None,
+    gcm: str | None = None,
+    rcm: str | None = None,
+    years_up_to: int | None = None,
     bias_correction: bool = False,
     historical: bool = False,
-    obs: bool = False,
     buffer: int = 0,
     xlim: tuple[float, float] | None = None,
     ylim: tuple[float, float] | None = None,
@@ -96,18 +96,24 @@ def get_climate_data(
     Args:
     country (str): Name of the country for which data is to be processed.
         Use None if specifying a region using xlim and ylim.
-    cordex_domain (str): CORDEX domain of the climate data. One of {VALID_DOMAINS}.
-    rcp (str): Representative Concentration Pathway. One of {VALID_RCPS}.
-    gcm (str): GCM name. One of {VALID_GCM}.
-    rcm (str): RCM name. One of {VALID_RCM}.
+    years_obs (range): Range of years for observational data (ERA5 only). Required when obs is True. (default: None).
+    obs (bool): Flag to indicate if processing observational data (default: False).
+        When True, only years_obs is required. CORDEX parameters are optional.
+    cordex_domain (str): CORDEX domain of the climate data. One of {VALID_DOMAINS}. 
+        Required when obs is False. (default: None).
+    rcp (str): Representative Concentration Pathway. One of {VALID_RCPS}. 
+        Required when obs is False. (default: None).
+    gcm (str): GCM name. One of {VALID_GCM}. 
+        Required when obs is False. (default: None).
+    rcm (str): RCM name. One of {VALID_RCM}. 
+        Required when obs is False. (default: None).
     years_up_to (int): The ending year for the projected data. Projections start in 2006 and ends in 2100.
         Hence, if years_up_to is set to 2030, data will be downloaded for the 2006-2030 period.
-    years_obs (range): Range of years for observational data (ERA5 only). Only used when obs is True. (default: None).
+        Required when obs is False. (default: None).
     bias_correction (bool): Whether to apply bias correction (default: False).
     historical (bool): Flag to indicate if processing historical data (default: False).
         If True, historical data is provided together with projections.
         Historical simulation runs for CORDEX-CORE initiative are provided for the 1980-2005 time period.
-    obs (bool): Flag to indicate if processing observational data (default: False).
     buffer (int): Buffer distance to expand the region of interest (default: 0).
     xlim (tuple or None): Longitudinal bounds of the region of interest. Use only when country is None (default: None).
     ylim (tuple or None): Latitudinal bounds of the region of interest. Use only when country is None (default: None).
@@ -119,8 +125,17 @@ def get_climate_data(
 
     Returns:
     dict: A dictionary containing processed climate data for each variable as an xarray object.
+    
+    Examples:
+    # For observations only:
+    data = get_climate_data(country="Togo", obs=True, years_obs=range(1990, 2011))
+    
+    # For CORDEX projections:
+    data = get_climate_data(country="Togo", cordex_domain="AFR-22", rcp="rcp26", 
+                           gcm="MPI", rcm="Reg", years_up_to=2030)
     """
 
+    # Validation for basic parameters
     if xlim is None and ylim is not None or xlim is not None and ylim is None:
         raise ValueError(
             "xlim and ylim mismatch: they must be both specified or both unspecified"
@@ -129,27 +144,46 @@ def get_climate_data(
         raise ValueError("You must specify a country or (xlim, ylim)")
     if country is not None and xlim is not None:
         raise ValueError("You must specify either country or (xlim, ylim), not both")
-    verify_variables = {
-        "cordex_domain": VALID_DOMAINS,
-        "rcp": VALID_RCPS,
-        "gcm": VALID_GCM,
-        "rcm": VALID_RCM,
-    }
-    for var_name, valid_values in verify_variables.items():
-        var_value = locals()[var_name]
-        if var_value not in valid_values:
-            raise ValueError(
-                f"Invalid {var_name}={var_value}. Must be one of {valid_values}"
-            )
-    if years_up_to <= 2006:
-        raise ValueError("years_up_to must be greater than 2006")
-    if years_obs is not None and not (1980 <= min(years_obs) <= max(years_obs) <= 2020):
-        raise ValueError("Years in years_obs must be within the range 1980 to 2020")
-    if obs and years_obs is None:
-        raise ValueError("years_obs must be provided when obs is True")
-    if not obs or years_obs is None:
-        # Make sure years_obs is set to default when obs=False
-        years_obs = DEFAULT_YEARS_OBS
+
+    # Conditional validation based on obs flag
+    if obs:
+        # When obs=True, only years_obs is required
+        if years_obs is None:
+            raise ValueError("years_obs must be provided when obs is True")
+        if not (1980 <= min(years_obs) <= max(years_obs) <= 2020):
+            raise ValueError("Years in years_obs must be within the range 1980 to 2020")
+        
+        # Set default values for CORDEX parameters (not used but needed for function calls)
+        cordex_domain = cordex_domain or "AFR-22"  # dummy value
+        rcp = rcp or "rcp26"  # dummy value
+        gcm = gcm or "MPI"  # dummy value
+        rcm = rcm or "Reg"  # dummy value
+        years_up_to = years_up_to or 2030  # dummy value
+    else:
+        # When obs=False, CORDEX parameters are required
+        required_params = {
+            "cordex_domain": VALID_DOMAINS,
+            "rcp": VALID_RCPS,
+            "gcm": VALID_GCM,
+            "rcm": VALID_RCM,
+        }
+        for param_name, valid_values in required_params.items():
+            param_value = locals()[param_name]
+            if param_value is None:
+                raise ValueError(f"{param_name} is required when obs is False")
+            if param_value not in valid_values:
+                raise ValueError(
+                    f"Invalid {param_name}={param_value}. Must be one of {valid_values}"
+                )
+        
+        if years_up_to is None:
+            raise ValueError("years_up_to is required when obs is False")
+        if years_up_to <= 2006:
+            raise ValueError("years_up_to must be greater than 2006")
+        
+        # Set default years_obs when not processing observations
+        if years_obs is None:
+            years_obs = DEFAULT_YEARS_OBS
 
     # Validate variables if provided
     if variables is not None:
@@ -163,7 +197,7 @@ def get_climate_data(
 
     _validate_urls(gcm, rcm, rcp, remote, cordex_domain, obs, historical, bias_correction)
 
-    bbox = _geo_localize(country, xlim, ylim, buffer, cordex_domain)
+    bbox = _geo_localize(country, xlim, ylim, buffer, cordex_domain, obs)
 
     with mp.Pool(processes=min(num_processes, len(variables))) as pool:
         futures = []
@@ -257,6 +291,7 @@ def _geo_localize(
     ylim: tuple[float, float] = None,
     buffer: int = 0,
     cordex_domain: str = None,
+    obs: bool = False,
 ) -> dict[str, tuple[float, float]]:
     if country:
         if xlim or ylim:
@@ -267,7 +302,12 @@ def _geo_localize(
         world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
         country_shp = world[world.name == country]
         if country_shp.empty:
-            raise ValueError(f"Country '{country}' is unknown.")
+            # Check if it's a capitalization issue
+            if country and country[0].islower():
+                capitalized = country.capitalize()
+                raise ValueError(f"Country '{country}' not found. Try capitalizing the first letter: '{capitalized}'")
+            else:
+                raise ValueError(f"Country '{country}' is unknown.")
         bounds = country_shp.total_bounds  # [minx, miny, maxx, maxy]
         xlim, ylim = (bounds[0], bounds[2]), (bounds[1], bounds[3])
     elif not (xlim and ylim):
@@ -279,8 +319,9 @@ def _geo_localize(
     xlim = (xlim[0] - buffer, xlim[1] + buffer)
     ylim = (ylim[0] - buffer, ylim[1] + buffer)
 
-    # Always validate CORDEX domain
-    if cordex_domain:
+    # Only validate CORDEX domain when processing non-observational data
+    # Skip validation for observations or when using dummy values
+    if not obs and cordex_domain:
         _validate_cordex_domain(xlim, ylim, cordex_domain)
 
     return {"xlim": xlim, "ylim": ylim}
@@ -653,16 +694,25 @@ def _download_data(
 
 
 if __name__ == "__main__":
-    data = get_climate_data(
+    # Example 1: Get observational data (simplified syntax)
+    print("Getting observational data...")
+    obs_data = get_climate_data(
         country="Togo",
-        variables=["hurs"],
+        obs=True,
+        years_obs=range(1990, 2011),
+        variables=["pr", "tasmax"]
+    )
+    print("Observational data keys:", list(obs_data.keys()))
+    
+    # Example 2: Get CORDEX projection data
+    print("\nGetting CORDEX projection data...")
+    proj_data = get_climate_data(
+        country="Togo",
+        variables=["tasmax", "tasmin"],
         cordex_domain="AFR-22",
         rcp="rcp26",
         gcm="MPI",
         rcm="Reg",
         years_up_to=2030,
-        obs=False,
-        bias_correction=False,
-        historical=False,
     )
-    print(data)
+    print("Projection data keys:", list(proj_data.keys()))
