@@ -103,5 +103,5 @@ Togo_climate_data = cavapy.get_climate_data(country="Togo", variables=["tasmax",
 
 ```
 import cavapy
-Togo_climate_data = cavapy.get_climate_data(country="Togo", cordex_domain="AFR-22",variables=["tasmax", "pr"], rcp="rcp26", gcm="MPI", rcm="REMO", years_up_to=2030, obs=True, bias_correction=True, historical=True, years_obs=range(1980,2019))
+Togo_climate_data = cavapy.get_climate_data(country="Togo", variables=["tasmax", "pr"], obs=True,  years_obs=range(1980,2019))
 ```
