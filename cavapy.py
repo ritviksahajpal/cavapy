@@ -299,8 +299,9 @@ def _geo_localize(
                 "Specify either a country or bounding box limits (xlim, ylim), but not both."
             )
         # Load country shapefile and extract bounds
-        world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
-        country_shp = world[world.name == country]
+        url = ("https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip")
+        world = gpd.read_file(url)
+        country_shp = world[world.NAME == country]
         if country_shp.empty:
             # Check if it's a capitalization issue
             if country and country[0].islower():
