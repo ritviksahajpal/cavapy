@@ -199,38 +199,60 @@ def get_climate_data(
 
     bbox = _geo_localize(country, xlim, ylim, buffer, cordex_domain, obs)
 
-    with mp.Pool(processes=min(num_processes, len(variables))) as pool:
-        futures = []
+    # ------------------------------------------------------------
+    # ❶ Decide whether to spin up a pool or run serially
+    # ------------------------------------------------------------
+    requested_procs = min(num_processes, len(variables))
+    results: dict[str, xr.DataArray] = {}
+
+    if requested_procs == 1:
+        # ――― serial path ―――
         for variable in variables:
-            futures.append(
+            results[variable] = process_worker(
+                max_threads_per_process,
+                variable=variable,
+                bbox=bbox,
+                cordex_domain=cordex_domain,
+                rcp=rcp,
+                gcm=gcm,
+                rcm=rcm,
+                years_up_to=years_up_to,
+                years_obs=years_obs,
+                obs=obs,
+                bias_correction=bias_correction,
+                historical=historical,
+                remote=remote,
+            )
+    else:
+        # ――― parallel path ―――
+        with mp.Pool(processes=requested_procs) as pool:
+            futures = [
                 pool.apply_async(
                     process_worker,
                     args=(max_threads_per_process,),
-                    kwds={
-                        "variable": variable,
-                        "bbox": bbox,
-                        "cordex_domain": cordex_domain,
-                        "rcp": rcp,
-                        "gcm": gcm,
-                        "rcm": rcm,
-                        "years_up_to": years_up_to,
-                        "years_obs": years_obs,
-                        "obs": obs,
-                        "bias_correction": bias_correction,
-                        "historical": historical,
-                        "remote": remote,
-                    },
+                    kwds=dict(
+                        variable=variable,
+                        bbox=bbox,
+                        cordex_domain=cordex_domain,
+                        rcp=rcp,
+                        gcm=gcm,
+                        rcm=rcm,
+                        years_up_to=years_up_to,
+                        years_obs=years_obs,
+                        obs=obs,
+                        bias_correction=bias_correction,
+                        historical=historical,
+                        remote=remote,
+                    ),
                 )
-            )
-
-        results = {
-            variable: futures[i].get() for i, variable in enumerate(variables)
-        }
-
-        pool.close()  # Prevent any more tasks from being submitted to the pool
-        pool.join()  # Wait for all worker processes to finish
+                for variable in variables
+            ]
+            results = {var: fut.get() for var, fut in zip(variables, futures)}
+            pool.close()
+            pool.join()
 
     return results
+
 
 
 def _validate_urls(
